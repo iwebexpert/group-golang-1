@@ -31,6 +31,6 @@ func main() {
 	fmt.Println("Insert phrase for search and press enter: ")
 	fmt.Scan(&s)
 
-	list := []string{"https://ya.ru"}
+	list := []string{"https://ya.ru", "https://google.com"}
 	fmt.Println(findOnSite(s, list))
 }
