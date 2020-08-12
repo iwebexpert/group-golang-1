@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -23,4 +24,13 @@ func findOnSite (s string, searchList []string) (res []string) {
 		}
 	}
 	return res
+}
+
+func main() {
+	var s string
+	fmt.Println("Insert phrase for search and press enter: ")
+	fmt.Scan(&s)
+
+	list := []string{"https://ya.ru"}
+	fmt.Println(findOnSite(s, list))
 }
