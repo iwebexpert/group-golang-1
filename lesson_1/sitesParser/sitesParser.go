@@ -67,10 +67,9 @@ func sitesParser(query string, pages []string) ([]string, error) {
 		wg.Add(1)
 
 		go func(page, query string) {
-			defer wg.Done()
-
 			pageContent, err := fetch(page)
 			if err != nil {
+				wg.Done()
 				errCh <- err
 				return
 			}
@@ -78,6 +77,8 @@ func sitesParser(query string, pages []string) ([]string, error) {
 			if strings.Contains(pageContent, query) {
 				resultPages = append(resultPages, page)
 			}
+
+			wg.Done()
 		}(page, query)
 	}
 
