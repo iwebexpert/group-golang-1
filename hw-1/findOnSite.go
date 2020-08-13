@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -26,11 +27,23 @@ func findOnSite (s string, searchList []string) (res []string) {
 	return res
 }
 
-func main() {
-	var s string
-	fmt.Println("Insert phrase for search and press enter: ")
-	fmt.Scan(&s)
+type urls []string
 
-	list := []string{"https://ya.ru", "https://google.com"}
-	fmt.Println(findOnSite(s, list))
+func(u *urls) String() string {
+	return fmt.Sprint(*u)
+}
+
+func(u *urls) Set(value string) error {
+	for _, pages := range strings.Split(value, " ") {
+		*u = append(*u, pages)
+	}
+	return nil
+}
+
+func main() {
+	query := flag.String("query", "empty", "string for search")
+	pages := flag.String("pages", "idk", "space-separated urls for search" )
+	flag.Parse()
+	fmt.Println("query:", *query)
+	fmt.Println("sites:", pages)
 }
