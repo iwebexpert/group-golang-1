@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -30,16 +31,25 @@ func main() {
 	//get pages
 	go func() {
 		for _, p := range pagesParsed {
-			response, _ := http.Get(p)
+			response, err := http.Get(p)
+			if err != nil {
+				log.Println(err)
+				log.Println("Looks like invalid URL. Skipping")
+				n--
+				continue
+			}
 			defer response.Body.Close()
-			bytesArray, _ := ioutil.ReadAll(response.Body)
+			bytesArray, err := ioutil.ReadAll(response.Body)
+			if err != nil {
+				log.Fatal(err)
+			}
 			page := pageProc{url: p, page: bytesArray}
 			pagesChan <- page
 		}
-		fmt.Println("pages done")
+		fmt.Println("GET pages done")
 	}()
+
 	//look for querry
-	fmt.Println(n)
 	go func() {
 		var result []string
 		var pageResult pageProc
@@ -52,7 +62,7 @@ func main() {
 
 		}
 		resultsChan <- result
-		fmt.Println("lookup finished")
+		fmt.Println("Lookup finished")
 	}()
 	//print result from channel
 	fmt.Println(<-resultsChan)

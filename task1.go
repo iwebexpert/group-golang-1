@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -18,10 +19,16 @@ func main() {
 	whoContains := []string{}
 	for _, p := range pagesParsed {
 
-		response, _ := http.Get(p)
+		response, err := http.Get(p)
+		if err != nil {
+			log.Fatal(err)
+		}
 		defer response.Body.Close()
 
-		bytesArray, _ := ioutil.ReadAll(response.Body)
+		bytesArray, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
 
 		if strings.Contains(string(bytesArray), *query) {
 			whoContains = append(whoContains, p)
@@ -29,17 +36,3 @@ func main() {
 	}
 	fmt.Println("Found", *query, "at:", whoContains)
 }
-
-//For homework
-//ya.ru
-//google.com
-//...
-
-// query
-//go run websocket.go --query "Red" --pages "http://ya.ru,http://1.ru"
-// "flag", поиск через "strings"
-
-//2 переменных - query, pages
-//GET pages
-//Ищем query
-//Возвращаем и отображаем в консоль список страниц, которые содержат query
