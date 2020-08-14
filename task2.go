@@ -11,6 +11,13 @@ import (
 	"time"
 )
 
+const diskAPIPublicURL = "https://cloud-api.yandex.net/v1/disk/public/resources?public_key="
+const diskAPIPathURL = "https://cloud-api.yandex.net/v1/disk/resources/download?path="
+const OAuthKey = "AgAEA7qjSNZVAAaMT3ljqBoh0kI_h2GoTA9w1dM" //Так делать нельзя! UNSAFE!
+
+var url = "https://yadi.sk/d/Sbjmcqfgl4wZZQ"
+var path = "%2FYaDiskFile"
+
 func DownloadFile(path string, url string) error {
 	// Get data
 	resp, err := http.Get(url)
@@ -30,7 +37,29 @@ func DownloadFile(path string, url string) error {
 	_, err = io.Copy(out, resp.Body)
 	return err
 }
-func main() {
+func getPublicLink(url string) string {
+	var link map[string]interface{}
+
+	resp, err := http.Get(diskAPIPublicURL + url)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+
+	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = json.Unmarshal(respBody, &link)
+	if err != nil {
+		log.Fatal(err)
+	}
+	srtURL := link["file"].(string)
+
+	return srtURL
+
+}
+func getPathLink(filePath string, key string) string {
 	var data map[string]interface{}
 	timeout := time.Duration(5 * time.Second)
 	client := http.Client{
@@ -39,8 +68,8 @@ func main() {
 
 	//reqest to get link from YaDisk
 
-	req, err := http.NewRequest("GET", "https://cloud-api.yandex.net/v1/disk/resources/download?path=%2FYaDiskFile", nil)
-	req.Header.Set("Authorization", "AgAEA7qjSNZVAAaMT3ljqBoh0kI_h2GoTA9w1dM")
+	req, err := http.NewRequest("GET", diskAPIPathURL+filePath, nil)
+	req.Header.Set("Authorization", key)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -49,6 +78,7 @@ func main() {
 		log.Fatal(err)
 	}
 	defer resp.Body.Close()
+
 	//Parsing response from YaDisk to map
 	bData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -57,13 +87,36 @@ func main() {
 	if err := json.Unmarshal(bData, &data); err != nil {
 		log.Fatal(err)
 	}
-	//Place link from map to var
-	href := data["href"].(string)
-	//fmt.Println(href)
 
-	errDownload := DownloadFile("fileDownloaded", href)
-	if errDownload != nil {
-		log.Fatal(err)
+	return data["href"].(string)
+}
+func main() {
+
+	filename := "YaDiskFile"
+	choice := 0
+
+	fmt.Println("New file name:")
+	fmt.Scanln(&filename)
+	for choice > 2 || choice < 1 {
+		fmt.Println("type 1 for downloading from link")
+		fmt.Println("type 2 for downloading from path on your disk")
+		fmt.Scanln(&choice)
 	}
-	fmt.Println("File downloaded")
+	switch choice {
+	case 1:
+		fmt.Println("Place public link:")
+		fmt.Scanln(&url)
+		err := DownloadFile(filename, getPublicLink(url))
+		if err != nil {
+			log.Fatal(err)
+		}
+	case 2:
+		fmt.Println("Name of file on disk? (Try YaDiskFile):") //YaDiskFile
+		fmt.Scanln(&path)
+		err := DownloadFile(filename, getPathLink(path, OAuthKey))
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	fmt.Println("File", filename, "downloaded")
 }
