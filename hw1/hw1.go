@@ -33,7 +33,6 @@ func main() {
 	var query = flag.String("query", "", "Your query")
 	var pages = flag.String("pages", "", "Pages for search")
 	var links []string
-	//"https://ya.ru,https://www.google.ru,https://mail.ru,https://www.rambler.ru,https://golang.org"
 	flag.Parse()
 
 	for _, link := range strings.Split(*pages, ",") {
