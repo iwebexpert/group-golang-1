@@ -8,6 +8,9 @@ import (
 	"strings"
 )
 
+// HowTo: run 'go build findOnSite.go'
+// run './findOnSite -query="somestring" -pages="space-separated urls for search"'
+
 //findOnSite returns a list of sites where found s string
 func findOnSite (s string, searchList []string) (res []string) {
 	for _, v := range searchList{
@@ -40,10 +43,12 @@ func(u *urls) Set(value string) error {
 	return nil
 }
 
+
 func main() {
-	query := flag.String("query", "empty", "string for search")
-	pages := flag.String("pages", "idk", "space-separated urls for search" )
+	query := flag.String("query", "empte", "query for search")
+	var pages urls
+	flag.Var(&pages, "pages", "pages for query search")
 	flag.Parse()
-	fmt.Println("query:", *query)
-	fmt.Println("sites:", pages)
+
+	fmt.Println(findOnSite(*query, pages))
 }
