@@ -9,7 +9,7 @@ import (
 )
 
 // HowTo: run 'go build findOnSite.go'
-// run './findOnSite -query="somestring" -pages="space-separated urls for search"'
+// run './findOnSite -query="somestring" -pages="comma-separated urls for search"'
 
 //findOnSite returns a list of sites where found s string
 func findOnSite (s string, searchList []string) (res []string) {
@@ -37,7 +37,7 @@ func(u *urls) String() string {
 }
 
 func(u *urls) Set(value string) error {
-	for _, pages := range strings.Split(value, " ") {
+	for _, pages := range strings.Split(value, ",") {
 		*u = append(*u, pages)
 	}
 	return nil
