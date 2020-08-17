@@ -47,7 +47,9 @@ func getRootHandler(w http.ResponseWriter, r *http.Request) {
 			sid = cookieSet(w, name[0])
 		}
 	}
-	w.Write([]byte("Hello " + getSeekerName(sid)))
+	w.Write([]byte("Hello " + getSeekerName(sid) + "<br>"))
+	w.Write([]byte("Use [server:port]/?name=[name] to set your name in session cookie" + "<br>"))
+	w.Write([]byte("Use [server:port]/seek?phrase=[phrase]&links=[link1]&links=[link2]... to seek phrase at web"))
 }
 
 func getSeekerName(sid string) string {
@@ -77,6 +79,7 @@ func getSeekHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		w.Write([]byte("Not found"))
 	}
+	w.Write([]byte("<br>Thanks for using our service, " + getSeekerName(sid)))
 }
 
 func cookieCheck(w http.ResponseWriter, r *http.Request) string {
