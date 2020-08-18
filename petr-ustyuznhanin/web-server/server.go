@@ -1,7 +1,7 @@
 package main
 
 import (
-	"flag"
+	"encoding/json"
 	"github.com/gorilla/mux"
 	"io/ioutil"
 	"log"
@@ -9,37 +9,51 @@ import (
 	"strings"
 )
 
-func handleGetQuery(w http.ResponseWriter, r *http.Request){
-	query := flag.String("q", "empty", "query to find")
-	pages := flag.String("p", "http://ya.ru", "pages for search")
-	flag.Parse()
+type QueryT struct {
+	Search string `json:"search"`
+	Sites []string `json:"sites"`
+}
 
-	splitPages := strings.Split(*pages, ",")
+var data QueryT
 
-	matches := []string{}
-
-	for _, p := range splitPages {
-		res, err := http.Get(p)
+func QueryContains(s QueryT) ([]string, error){
+	var answer []string
+	for _, v := range s.Sites {
+		res, err := http.Get(v)
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
 		defer res.Body.Close()
 
-		bytes, err := ioutil.ReadAll(res.Body)
+		body, err := ioutil.ReadAll(res.Body)
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
 
-		if strings.Contains(string(bytes), *query){
-			matches = append(matches, p)
-			w.Write([]byte(p))
+		if strings.Contains(string(body), s.Search); err != nil{
+			answer = append(answer, v)
 		}
 	}
+	return answer, nil
+}
+
+func GetQueryParams(w http.ResponseWriter, r *http.Request)  {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil { //не понимаю как в таких случаях обработать ошибку
+		return
+	}
+	err = json.Unmarshal(body, &data)
+	if err != nil { //не понимаю как в таких случаях обработать ошибку
+		return
+	}
+}
+
+func handleGetQuery (w http.ResponseWriter, r *http.Request) {
+	QueryContains(data)
 }
 
 func main() {
 	r := mux.NewRouter()
-	r.HandleFunc("/", handleGetQuery)
-
+	r.HandleFunc("/search", handleGetQuery)
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
