@@ -12,7 +12,7 @@ import (
 )
 
 
-func SearchLinks(queryString string, urls []string) ([]string, error) {
+func SearchLinksX(queryString string, urls []string) ([]string, error) {
 	group := struct {
 		errgroup.Group //запуск горутин с использованием ошибок
 		sync.Mutex //синхронизация горутин
@@ -52,12 +52,11 @@ func main() {
 		"https://ya.ru/",
 		"https://yandex.ru/",
 	}
-
-	urls := flag.String("urls", strings.Join(defaultLinks, ","), "list of sites")
 	querySearch := flag.String("query", "ya", "query for search")
+	urls := flag.String("urls", strings.Join(defaultLinks, ","), "list of sites")
 	flag.Parse()
 
-	resultSearch, err := SearchLinks(*querySearch, strings.Split(*urls, ","))
+	resultSearch, err := SearchLinksX(*querySearch, strings.Split(*urls, ","))
 	if err != nil {
 		log.Fatal(err)
 	}
