@@ -1,0 +1,32 @@
+{{define "createPost"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}}</title>
+    {{template "UIkit"}}
+</head>
+<body>
+    <h1>{{.Title}}</h1>
+    <div class="uk-card uk-card-default uk-card-body">
+        <span>Всего записей: {{len .Posts}}</span>
+        <form action="#">
+            <h3>Новый пост</h3>
+            <h5>Тема: <input name="Header" type="text"></h5>
+            <textarea cols="30" rows="10"></textarea><br>
+            <input type="submit" value="Отправить"> <input type="reset">
+        </form>
+    </div>
+</body>
+</html>
+{{end}}
+
+{{define "UIkit"}}
+<!-- UIkit CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/css/uikit.min.css" />
+
+<!-- UIkit JS -->
+<script src="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/js/uikit.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/js/uikit-icons.min.js"></script>
+{{end}}
