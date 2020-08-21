@@ -7,7 +7,7 @@ import (
 
 func main() {
 	r := gin.Default()
-	r.LoadHTMLGlob("D:\\geekbrains\\Golang\\second-quarter\\group-golang-1\\g.vorobyev\\lesson3\\templates\\*")
+	r.LoadHTMLGlob("templates/*")
 	r.GET("/", blog.ShowPosts)
 	b := r.Group("/blog")
 	{
