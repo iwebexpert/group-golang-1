@@ -1,6 +1,7 @@
 package blog
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"model"
@@ -11,14 +12,18 @@ import (
 // shit shit shit
 var PostType = map[int]model.Post{}
 
-func getId(rc *gin.Context) int {
-	var pt PageType
+func getId(rc *gin.Context) (int, error) {
+	var pt model.PageType
 	if err := rc.ShouldBindUri(&pt); err != nil {
-		rc.JSON(400, gin.H{"err": err})
+		return 0, errors.New("ERROR: Id is not set")
 	}
-	id, _ := strconv.Atoi(pt.Id)
 
-	return id
+	id, err := strconv.Atoi(pt.Id)
+	if err != nil {
+		return 0, errors.New("ERROR: Id is not integer")
+	}
+
+	return id, nil
 }
 
 func ShowPosts(rc *gin.Context) {
@@ -26,7 +31,11 @@ func ShowPosts(rc *gin.Context) {
 }
 
 func ShowPost(rc *gin.Context) {
-	id := getId(rc)
+	id, err := getId(rc)
+	if err != nil {
+		rc.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	fmt.Println(id)
 	if id > len(PostType) {
@@ -46,9 +55,14 @@ func AddPost(rc *gin.Context) {
 }
 
 func EditPost(rc *gin.Context) {
+	id, err := getId(rc)
+	if err != nil {
+		rc.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	title := rc.PostForm("title")
 	post_message := rc.PostForm("post_message")
-	id := getId(rc)
 	max_len := len(PostType)
 
 	// if we try edit unexist post
@@ -66,7 +80,12 @@ func ShowAddPost(rc *gin.Context) {
 }
 
 func ShowEditPost(rc *gin.Context) {
-	id := getId(rc)
+	id, err := getId(rc)
+	if err != nil {
+		rc.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	if id > len(PostType) {
 		rc.JSON(http.StatusNotFound, gin.H{"post": "Not Found"})
 		return
