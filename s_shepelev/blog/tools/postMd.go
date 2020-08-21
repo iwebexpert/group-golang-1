@@ -5,8 +5,11 @@ import (
 	"html/template"
 	"io/ioutil"
 	"os"
+	"path"
 	"strings"
 	"sync"
+
+	"github.com/russross/blackfriday"
 )
 
 type post struct {
@@ -24,6 +27,22 @@ func NewPostArray() *postArray {
 	p := postArray{}
 	p.Items = make(map[string]post)
 	return &p
+}
+
+func (p *postArray) InitPosts() error {
+	files, err := ioutil.ReadDir("../posts")
+	if err != nil {
+		return err
+	}
+
+	for _, file := range files {
+		_, _, err := p.Load(path.Join("../posts", file.Name()))
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // Load markdown file and convert it to html
@@ -47,7 +66,7 @@ func (p *postArray) Load(md string) (post, int, error) {
 		lines := strings.Split(string(fileread), "\n")
 		title := string(lines[0])
 		body := strings.Join(lines[1:len(lines)], "\n")
-		// body = string(blackfriday.MarkdownCommon([]byte(body)))
+		body = string(blackfriday.Run([]byte(body)))
 		p.Items[md] = post{title, template.HTML(body), info.ModTime().UnixNano()}
 	}
 	post := p.Items[md]
