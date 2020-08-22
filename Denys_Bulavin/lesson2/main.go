@@ -72,6 +72,7 @@ func addCookie(w http.ResponseWriter, c Cookie) {
 		Value:   c.Value,
 		Expires: expire,
 	}
+
 	http.SetCookie(w, &cookie)
 }
 
