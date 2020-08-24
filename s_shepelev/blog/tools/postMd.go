@@ -10,6 +10,7 @@ import (
 	"sync"
 
 	"github.com/russross/blackfriday"
+	uuid "github.com/satori/go.uuid"
 )
 
 type post struct {
@@ -62,7 +63,10 @@ func (p *postArray) Load(md string) (post, int, error) {
 	if !ok || (ok && val.ModTime != info.ModTime().UnixNano()) {
 		p.RLock()
 		defer p.RUnlock()
-		fileread, _ := ioutil.ReadFile(md)
+		fileread, err := ioutil.ReadFile(md)
+		if err != nil {
+			return post{}, 500, err
+		}
 		lines := strings.Split(string(fileread), "\n")
 		title := string(lines[0])
 		body := strings.Join(lines[1:len(lines)], "\n")
@@ -71,4 +75,61 @@ func (p *postArray) Load(md string) (post, int, error) {
 	}
 	post := p.Items[md]
 	return post, 200, nil
+}
+
+// ChangePost - write new data to file and change data in posts structure
+func (p *postArray) ChangePost(postName, title, text string) error {
+	data := []byte(title + "\n" + text)
+
+	err := ioutil.WriteFile(postName, data, 0644)
+	if err != nil {
+		return err
+	}
+
+	p.RLock()
+	defer p.RUnlock()
+
+	info, err := os.Stat(postName)
+	if err != nil {
+		return err
+	}
+
+	body := string(blackfriday.Run([]byte(text + "\n")))
+
+	p.Items[postName] = post{title, template.HTML(body), info.ModTime().UnixNano()}
+
+	return nil
+}
+
+func (p *postArray) CreatePost(title, text string) error {
+
+	postNamePrefix := "../posts/"
+	fileName := uuid.NewV4()
+	postName := postNamePrefix + fileName.String() + ".md"
+
+	fd, err := os.Create(postName)
+	if err != nil {
+		return err
+	}
+
+	data := title + "\n" + text
+
+	_, err = fd.WriteString(data)
+	if err != nil {
+		return err
+	}
+
+	p.RLock()
+	defer p.RUnlock()
+
+	info, err := os.Stat(postName)
+	if err != nil {
+		return err
+	}
+
+	body := string(blackfriday.Run([]byte(text + "\n")))
+
+	p.Items[postName] = post{title, template.HTML(body), info.ModTime().UnixNano()}
+
+	return nil
 }

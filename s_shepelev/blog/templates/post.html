@@ -1,15 +1,55 @@
 {{define "body"}}
 <div class="uk-container">
-<div class="uk-flex">
+    <div class="uk-child-width-1-2@s" uk-grid>
+        <div>
+            <div class="uk-panel uk-panel-box uk-text-break">
+                <div class="uk-card uk-card-body uk-card-default uk-margin-top uk-margin-left">
+                    <h3>{{.Title}}</h3>
+                    <p>{{.Body}}</p>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="uk-panel uk-panel-box uk-text-break uk-margin-top uk-margin-left">
+                <input class="uk-input" type="text" placeholder="Title" id="PostTitle">
+                <textarea class="uk-textarea" rows="6" placeholder="Text" id="PostText"></textarea>
+                <button class="uk-button uk-button-primary uk-margin uk-align-right" id="SavePost">Save Post</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-{{range $index, $value := .Items}}
-<div class="uk-card uk-card-default uk-card-body uk-margin-top uk-margin-left">
+<script>
+    document.getElementById("SavePost").addEventListener("click", () => {
+        let url = document.URL
+        let title = document.getElementById("PostTitle").value;
+        let text = document.getElementById("PostText").value;
 
-<h2>{{.Title}}</h2>
-{{.Body}}
-</div>
-</a>
+        if (title === "" && text === "") {
+            UIkit.notification({
+                message: 'Fields title and text are empty!',
+                status: 'danger',
+                pos: 'top-center'
+            });
+            return
+        }
+
+        let req = fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                'title': title,
+                'text': text,
+            })
+        }).
+            then((response) => {
+                if (response.status === 201) {
+                    window.history.pushState({page: '/'}, null, '/');
+                    window.location.reload();
+                }
+            })
+    });
+</script>
 {{end}}
-{{end}}
-</div>
-</div>

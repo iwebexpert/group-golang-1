@@ -1,0 +1,14 @@
+{{define "body"}}
+<div class="uk-container">
+<div class="uk-flex">
+
+{{range $index, $value := .Items}}
+<a href="{{$index}}" class="uk-display-block uk-card uk-card-body uk-card-default uk-card-hover 
+    uk-height-max-medium uk-margin-top uk-margin-left uk-link-toggle uk-width-medium">   
+    <h3 class="uk-card-title"><span class="uk-link-heading">{{.Title}}</span></h3>
+    <p>{{.Body}}</p>
+</a>
+{{end}}
+{{end}}
+</div>
+</div>

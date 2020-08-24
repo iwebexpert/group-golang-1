@@ -1,2 +1,2 @@
-# Second Post
+Second Post
 > Golang
