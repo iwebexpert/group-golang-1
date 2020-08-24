@@ -1,6 +1,7 @@
 {{define "body"}}
 <div class="uk-container">
     <div class="uk-align-center uk-margin-top">
+        <input class="uk-input" type="text" placeholder="Author" id="PostAuthor">
         <input class="uk-input" type="text" placeholder="Title" id="PostTitle">
         <textarea class="uk-textarea" rows="6" placeholder="Text" id="PostText"></textarea>
         <button class="uk-button uk-button-primary uk-margin uk-align-right" id="CreatePost">Create post</button>
@@ -12,8 +13,9 @@
         let url = document.URL
         let title = document.getElementById("PostTitle").value;
         let text = document.getElementById("PostText").value;
+        let author = document.getElementById("PostAuthor").value;
 
-        if (title === "" || text === "") {
+        if (title === "" || text === "" || author === "") {
             UIkit.notification({
                 message: 'Need to feel title and text values!',
                 status: 'danger',
@@ -29,7 +31,8 @@
             },
             body: JSON.stringify({
                 'title': title,
-                'text': text,
+                'description': text,
+                'author': author,
             })
         }).
             then((response) => {

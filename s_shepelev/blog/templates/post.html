@@ -4,13 +4,15 @@
         <div>
             <div class="uk-panel uk-panel-box uk-text-break">
                 <div class="uk-card uk-card-body uk-card-default uk-margin-top uk-margin-left">
+                    <div class="uk-card-badge uk-label">{{.Author}}</div>
                     <h3>{{.Title}}</h3>
-                    <p>{{.Body}}</p>
+                    <p>{{.Description}}</p>
                 </div>
             </div>
         </div>
         <div>
             <div class="uk-panel uk-panel-box uk-text-break uk-margin-top uk-margin-left">
+                <input class="uk-input" type="text" placeholder="Author" id="PostAuthor">
                 <input class="uk-input" type="text" placeholder="Title" id="PostTitle">
                 <textarea class="uk-textarea" rows="6" placeholder="Text" id="PostText"></textarea>
                 <button class="uk-button uk-button-primary uk-margin uk-align-right" id="SavePost">Save Post</button>
@@ -24,8 +26,9 @@
         let url = document.URL
         let title = document.getElementById("PostTitle").value;
         let text = document.getElementById("PostText").value;
+        let author = document.getElementById("PostAuthor").value;
 
-        if (title === "" && text === "") {
+        if (title === "" && text === "" && author === "") {
             UIkit.notification({
                 message: 'Fields title and text are empty!',
                 status: 'danger',
@@ -41,7 +44,8 @@
             },
             body: JSON.stringify({
                 'title': title,
-                'text': text,
+                'description': text,
+                'author': author,
             })
         }).
             then((response) => {
