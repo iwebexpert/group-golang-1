@@ -18,8 +18,9 @@ func SearchLinks(queryString string, urls []string, wg *sync.WaitGroup) ([]strin
 		urls: make([]string, 0, len(urls)),
 	}
 	for _, v := range urls {
-		//go func() {
-			res, err := http.Get(v)
+		url := v
+
+			res, err := http.Get(url)
 			if err != nil {
 				log.Fatal(err) // тут нельзя прокинуть ошибку выше в main, или нужен просто retrun, что неинформативно
 			}
@@ -32,12 +33,12 @@ func SearchLinks(queryString string, urls []string, wg *sync.WaitGroup) ([]strin
 
 			if strings.Contains(string(body),queryString) {
 				answer.Lock()
-				answer.urls = append(answer.urls, v)
+				answer.urls = append(answer.urls, url)
 				answer.Unlock()
 			}
-		//}()
+
 	}
-	wg.Done()
+	defer wg.Done()
 	return answer.urls, nil
 }
 
@@ -58,6 +59,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	wg.Wait()
 	fmt.Println(strings.Join(resultSearch, "\n"))
 }

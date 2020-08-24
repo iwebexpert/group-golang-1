@@ -22,8 +22,10 @@ func SearchLinksX(queryString string, urls []string) ([]string, error) {
 	}
 
 	for _, v := range urls {
+		url := v
+
 		group.Go(func() error { // запускает функцию внутри горутины
-			res, err := http.Get(v)
+			res, err := http.Get(url)
 			if err != nil {
 				return err
 			}
@@ -36,7 +38,7 @@ func SearchLinksX(queryString string, urls []string) ([]string, error) {
 
 			if strings.Contains(string(body), queryString) {
 				group.Lock() //блокировка на случай, если одновременно будет проходить запись в group.url
-				group.urls = append(group.urls, v)
+				group.urls = append(group.urls, url)
 				group.Unlock()
 			}
 			return nil
