@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {{template "UIkit"}}
+    {{template "JS"}}
+</head>
+<body>
+    <h1>Блог</h1>
+    <div class="uk-card uk-card-default uk-card-body">    
+    {{template "BlogPosts" .}}
+    <hr>
+    {{template "NewPost"}}
+    </div>
+</body>
+</html>
+
+{{define "BlogPosts"}}
+<div class="uk-card uk-card-body">
+    {{range $key, $val := .Posts}}
+        <div class="uk-card uk-card-default uk-card-body" post-id="{{.ID}}">
+            <div>
+                <button class="uk-button uk-button-default" onclick="updateTask('{{.ID}}')">Сохранить</button>
+                <button class="uk-button uk-button-default" onclick="deleteTask('{{.ID}}')">Удалить</button>
+            </div>
+            <p>Опубликовано {{.PublicDate.Format "02.01.2006 15:04:05"}}</p>
+            <input type="text" class="uk-input input-about" value="{{.About}}"/>
+            <input type="text" class="uk-input input-text" value="{{.Text}}"/>
+        </div>
+    {{end}}
+</div>
+{{end}}   
+
+{{define "NewPost"}}
+<div class="uk-card uk-card-body">
+    <div class="uk-card uk-card-default uk-card-body" post-id="new">
+        <div>
+            <input type="checkbox" class="uk-checkbox">
+            <button class="uk-button uk-button-default" onclick="createTask()">Сохранить</button>
+        </div>
+        <input type="text" class="uk-input input-about-new">
+        <input type="text" class="uk-input input-text-new">
+    </div>
+</div>
+{{end}}
+
+{{define "UIkit"}}
+<!-- UIkit CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/css/uikit.min.css" />
+
+<!-- UIkit JS -->
+<script src="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/js/uikit.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/js/uikit-icons.min.js"></script>
+{{end}}
+
+{{define "JS"}}
+<script>
+    async function createTask(){
+        console.log('createTask()');
+        let taskForm = document.querySelector('div[post-id="new"]');
+        let postAbout = taskForm.querySelector(`input[class="input-about-new"]`).value;
+        let postText = taskForm.querySelector(`input[class="input-text-new"]`).value;
+        console.log(postAbout, postText);
+
+        let data = await fetch(`/api/v1/blog`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        about: postAbout,
+                        text: postText                        
+                    }),
+                });
+
+                let dataTask = await data.json();
+                if(dataTask){
+                    console.log(dataTask);
+                    window.location.reload();
+                }
+    }
+
+    async function updateTask(id){
+        console.log('updateTask()');
+        let taskForm = document.querySelector(`div[post-id="${id}"]`);
+        let taskAbout = taskForm.querySelector(`input[class="input-about"]`).value;
+        let taskText = taskForm.querySelector(`input[class="input-text"]`).value;
+        //console.log(taskCmpleted, taskText);
+
+        let data = await fetch(`/api/v1/blog/${id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        about: postAbout,
+                        text: postText 
+                    }),
+                });
+
+        let dataTask = await data.json();
+                if(dataTask){
+                    console.log(dataTask);
+                    window.location.reload();
+                }
+    }
+
+    function deleteTask(id){
+        console.log('deleteTask()');
+        
+        fetch(`/api/v1/blog/${id}`, {
+                    method: 'DELETE',
+                }).then(response => {
+                    window.location.reload();
+                });
+    }
+
+</script>
+{{end}}
