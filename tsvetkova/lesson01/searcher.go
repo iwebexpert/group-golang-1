@@ -10,6 +10,11 @@ import (
 	"sync"
 )
 
+type SearchResult struct {
+	urls []string
+	m 	 sync.Mutex
+}
+
 func getPage(url string) (string, error) {
 	response, err := http.Get(url)
 	if err != nil {
@@ -27,7 +32,7 @@ func getPage(url string) (string, error) {
 
 func Search(query string, pages []string) []string {
 	var wg sync.WaitGroup
-	var result []string
+	var result SearchResult
 
 	for _, url := range pages {
 		wg.Add(1)
@@ -41,13 +46,15 @@ func Search(query string, pages []string) []string {
 			}
 
 			if strings.Contains(text, query) {
-				result = append(result, url)
+				result.m.Lock()
+				result.urls = append(result.urls, url)
+				result.m.Unlock()
 			}
 		}(url)
 	}
 
 	wg.Wait()
-	return result
+	return result.urls
 }
 
 func parseArgs() (string, []string) {
