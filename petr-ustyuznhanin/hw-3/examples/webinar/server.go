@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/go-chi/chi"
 	"html/template"
 	"io/ioutil"
 	"math"
@@ -52,4 +53,21 @@ func (tasks TaskItems) TaskWithStatus(completed bool) int {
 func (tasks TaskItems) CompletedTasksPercent() float64 {
 	percent := float64(tasks.TaskWithStatus(true))/float64(len(tasks))
 	return math.Round(percent * 100)
+}
+
+func main() {
+	router := chi.NewRouter()
+	 server := Server{
+		 Title: "The Task Manager",
+		 Tasks: TaskItems{
+		 	{Text: "Изучить Го", Completed: false, Labels: []string{"Go", "Lessons"}},
+		 	{Text: "Create web-server", Completed: true, Labels: []string{"Go", "Server"}},
+		 	{Text: "Xyz", Completed: false},
+		 },
+	 }
+
+	 router.Route("/", func(r chi.Router){
+	 	r.Get("/", server.GetIndexHandler)
+	 })
+	 http.ListenAndServe(":8080", router)
 }
