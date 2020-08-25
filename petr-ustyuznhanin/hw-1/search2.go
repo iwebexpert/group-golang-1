@@ -21,9 +21,7 @@ func SearchLinksX(queryString string, urls []string) ([]string, error) {
 		urls: make([]string, 0, len(urls)),
 	}
 
-	for _, v := range urls {
-		url := v
-
+	for _, url := range urls {
 		group.Go(func() error { // запускает функцию внутри горутины
 			res, err := http.Get(url)
 			if err != nil {
