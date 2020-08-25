@@ -13,6 +13,9 @@ pages/ - для проверки работы сервера
 }
 
 siteParser.go
+Для проверки:
+POST https://localhost:8080
+in body : {"search":"image","sites": ["https://yandex.ru/","https://google.com/"]}
 
 2. Напишите два роута: один будет записывать информацию в Cookie (например, имя), а второй — получать ее и выводить в ответе на запрос.
 
