@@ -11,4 +11,14 @@ pages/ - для проверки работы сервера
       "второй сайт"
   ]
 }
+
+siteParser.go
+
 2. Напишите два роута: один будет записывать информацию в Cookie (например, имя), а второй — получать ее и выводить в ответе на запрос.
+
+serverChi.go
+
+Запросы для проверки:
+GET https://localhost:8080/one - Unathorized
+POST https://localhost:8080/one в Body прописать value: data.
+GET https://localhost:8080/one - data
