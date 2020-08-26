@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strconv"
 	"text/template"
 
 	"github.com/go-chi/chi"
@@ -11,7 +12,7 @@ import (
 
 type HomePage struct {
 	Title string
-	Posts PostItems
+	Posts Posts
 }
 
 type PostPage struct {
@@ -19,7 +20,7 @@ type PostPage struct {
 	Post  PostItem
 }
 
-type PostItems []PostItem
+type Posts []PostItem
 
 type PostItem struct {
 	ID     int
@@ -28,6 +29,7 @@ type PostItem struct {
 	Labels []string
 }
 
+// GetIndexHandler : 1. Создайте роут и шаблон для отображения всех постов в блоге.
 func (home *HomePage) GetIndexHandler(w http.ResponseWriter, r *http.Request) {
 	file, err := os.Open("./www/index.html")
 	if err != nil {
@@ -46,19 +48,51 @@ func (home *HomePage) GetIndexHandler(w http.ResponseWriter, r *http.Request) {
 	templateMain.ExecuteTemplate(w, "personalBlog", home)
 }
 
+// GetDetailPost : 2. Создайте роут и шаблон для просмотра конкретного поста в блоге.
+func (home *HomePage) GetDetailPost(w http.ResponseWriter, r *http.Request) {
+	file, err := os.Open("./www/post.html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+	defer file.Close()
+
+	data, err := ioutil.ReadAll(file)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	postID, err := strconv.Atoi(r.URL.Query().Get("ID"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	dPost := home.Posts[postID-1]
+	DetailedPost := PostPage{
+		Title: dPost.Header,
+		Post:  dPost,
+	}
+
+	templateMain := template.Must(template.New("post").Parse(string(data)))
+	templateMain.ExecuteTemplate(w, "post", DetailedPost)
+}
+
+var home = HomePage{
+	Title: "Personal Blog!",
+	Posts: Posts{
+		{ID: 1, Header: "Как я догонял группу", Text: "Жоска", Labels: []string{"кул стори", "попа в мыле"}},
+		{ID: 2, Header: "Получилось?", Text: "Если ты это читаешь, то да", Labels: []string{"победа", "успех"}},
+	},
+}
+
 func main() {
 	route := chi.NewRouter()
 
-	home := HomePage{
-		Title: "Personal Blog!",
-		Posts: PostItems{
-			{ID: 1, Header: "Как я догонял группу", Text: "Жоска", Labels: []string{"кул стори", "попа в мыле"}},
-			{ID: 2, Header: "Получилось?", Text: "Если ты это читаешь, то да", Labels: []string{"победа", "успех"}},
-		},
-	}
-
 	route.Route("/", func(r chi.Router) {
 		r.Get("/", home.GetIndexHandler)
+		r.Get("/detail/", home.GetDetailPost)
 	})
 	http.ListenAndServe(":8080", route)
 }
