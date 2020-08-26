@@ -1,12 +1,13 @@
 package main
 
 import (
-	"github.com/go-chi/chi"
 	"html/template"
 	"io/ioutil"
 	"math"
 	"net/http"
 	"os"
+
+	"github.com/go-chi/chi"
 )
 
 type Server struct {
@@ -17,9 +18,9 @@ type Server struct {
 type TaskItems []TaskItem
 
 type TaskItem struct {
-	Text string
+	Text      string
 	Completed bool
-	Labels []string
+	Labels    []string
 }
 
 func (server *Server) GetIndexHandler(w http.ResponseWriter, r *http.Request) {
@@ -51,23 +52,23 @@ func (tasks TaskItems) TaskWithStatus(completed bool) int {
 }
 
 func (tasks TaskItems) CompletedTasksPercent() float64 {
-	percent := float64(tasks.TaskWithStatus(true))/float64(len(tasks))
+	percent := float64(tasks.TaskWithStatus(true)) / float64(len(tasks))
 	return math.Round(percent * 100)
 }
 
 func main() {
-	router := chi.NewRouter()
-	 server := Server{
-		 Title: "The Task Manager",
-		 Tasks: TaskItems{
-		 	{Text: "Изучить Го", Completed: false, Labels: []string{"Go", "Lessons"}},
-		 	{Text: "Create web-server", Completed: true, Labels: []string{"Go", "Server"}},
-		 	{Text: "Xyz", Completed: false},
-		 },
-	 }
+	route := chi.NewRouter()
+	server := Server{
+		Title: "The Task Manager",
+		Tasks: TaskItems{
+			{Text: "Изучить Го", Completed: false, Labels: []string{"Go", "Lessons"}},
+			{Text: "Create web-server", Completed: true, Labels: []string{"Go", "Server"}},
+			{Text: "Xyz", Completed: false},
+		},
+	}
 
-	 router.Route("/", func(r chi.Router){
-	 	r.Get("/", server.GetIndexHandler)
-	 })
-	 http.ListenAndServe(":8080", router)
+	route.Route("/", func(r chi.Router) {
+		r.Get("/", server.GetIndexHandler)
+	})
+	http.ListenAndServe(":8080", route)
 }
