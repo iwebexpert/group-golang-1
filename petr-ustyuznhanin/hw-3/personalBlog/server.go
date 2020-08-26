@@ -79,6 +79,11 @@ func (home *HomePage) GetDetailPost(w http.ResponseWriter, r *http.Request) {
 	templateMain.ExecuteTemplate(w, "post", DetailedPost)
 }
 
+// PostPostHamdler Создайте роут и шаблон для редактирования и создания материала.
+func (home *HomePage) PostPostHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+
 var home = HomePage{
 	Title: "Personal Blog!",
 	Posts: Posts{
@@ -93,6 +98,7 @@ func main() {
 	route.Route("/", func(r chi.Router) {
 		r.Get("/", home.GetIndexHandler)
 		r.Get("/detail/", home.GetDetailPost)
+		r.Post("", home.PostPostHandler)
 	})
 	http.ListenAndServe(":8080", route)
 }
