@@ -9,19 +9,26 @@ import (
 	"github.com/go-chi/chi"
 )
 
-type Server struct {
+type HomePage struct {
 	Title string
 	Posts PostItems
+}
+
+type PostPage struct {
+	Title string
+	Post  PostItem
 }
 
 type PostItems []PostItem
 
 type PostItem struct {
+	ID     int
+	Header string
 	Text   string
 	Labels []string
 }
 
-func (server *Server) GetIndexHandler(w http.ResponseWriter, r *http.Request) {
+func (home *HomePage) GetIndexHandler(w http.ResponseWriter, r *http.Request) {
 	file, err := os.Open("./www/index.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
@@ -36,23 +43,22 @@ func (server *Server) GetIndexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	templateMain := template.Must(template.New("personalBlog").Parse(string(data)))
-	templateMain.ExecuteTemplate(w, "personalBlog", server)
+	templateMain.ExecuteTemplate(w, "personalBlog", home)
 }
 
 func main() {
 	route := chi.NewRouter()
 
-	server := Server{
+	home := HomePage{
 		Title: "Personal Blog!",
 		Posts: PostItems{
-			{Text: "Изучить Го", Labels: []string{"Go", "Lessons"}},
-			{Text: "Create web-server", Labels: []string{"Go", "Server"}},
-			{Text: "Xyz"},
+			{ID: 1, Header: "Как я догонял группу", Text: "Жоска", Labels: []string{"кул стори", "попа в мыле"}},
+			{ID: 2, Header: "Получилось?", Text: "Если ты это читаешь, то да", Labels: []string{"победа", "успех"}},
 		},
 	}
 
 	route.Route("/", func(r chi.Router) {
-		r.Get("/", server.GetIndexHandler)
+		r.Get("/", home.GetIndexHandler)
 	})
 	http.ListenAndServe(":8080", route)
 }
