@@ -11,11 +11,33 @@
     <h1>{{.Title}}!</h1>
     <div class="uk-card uk-card-default uk-card-body">
         <span>Всего постов: {{len .Posts}}</span>
-        <!-- {{template "Tasks" .}} -->
+        {{template "Posts" .}}
     </div>
 </body>
 </html>
 {{end}}
+
+{{define "Posts"}}
+<div class="uk-card uk-card-body">
+    <ul class="uk-list">
+        {{range $key, $val := .Posts}}
+        <li>
+          <a style="display:block" href="detail/?ID={{.ID}}">
+            <div class="uk-card uk-card-default uk-card-body">
+              <span>{{.Header}}</span>  
+                <div class="uk-align-right">
+                    {{range .Labels}}
+                    <span class="uk-label">{{.}}</span>
+                    {{end}}
+                </div>
+            </div>
+          </a>
+        </li>
+        {{end}}
+    </ul>
+ </div>
+{{end}}
+
 
 {{define "UIkit"}}
 <!-- UIkit CSS -->
