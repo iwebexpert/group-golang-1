@@ -15,12 +15,10 @@ type HomePage struct {
 	Posts Posts
 }
 
-type PostPage struct {
+type DetailedPage struct {
 	Title string
 	Post  PostItem
 }
-
-type Posts []PostItem
 
 type PostItem struct {
 	ID     int
@@ -28,6 +26,8 @@ type PostItem struct {
 	Text   string
 	Labels []string
 }
+
+type Posts []PostItem
 
 // GetIndexHandler : 1. Создайте роут и шаблон для отображения всех постов в блоге.
 func (home *HomePage) GetIndexHandler(w http.ResponseWriter, r *http.Request) {
@@ -50,29 +50,30 @@ func (home *HomePage) GetIndexHandler(w http.ResponseWriter, r *http.Request) {
 
 // GetDetailPost : 2. Создайте роут и шаблон для просмотра конкретного поста в блоге.
 func (home *HomePage) GetDetailPost(w http.ResponseWriter, r *http.Request) {
-
-	id, err := strconv.Atoi(chi.URLParam(r, "ID"))
+	file, err := os.Open("./www/detailPage.html")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
 	}
 
-	for _, value := range home.Posts {
-		if id == value.ID {
-			file, err := os.Open("./www/detailPost.html")
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusNotFound)
-				return
-			}
-
-			data, err := ioutil.ReadAll(file)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusNotFound)
-				return
-			}
-			templateMain := template.Must(template.New("detailPost").Parse(string(data)))
-			templateMain.ExecuteTemplate(w, "detailPost", value)
-		}
+	data, err := ioutil.ReadAll(file)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
 	}
+
+	PostID, err := strconv.Atoi(r.URL.Query().Get("ID"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+	dPost := home.Posts[PostID-1]
+	DPage := DetailedPage{
+		Title: dPost.Header,
+		Post:  dPost,
+	}
+	templateMain := template.Must(template.New("Detail").Parse(string(data)))
+	templateMain.ExecuteTemplate(w, "Detail", DPage)
 }
 
 /*// PostPostHandler Создайте роут и шаблон для редактирования и создания материала.
@@ -126,7 +127,7 @@ func main() {
 
 	route.Route("/", func(r chi.Router) {
 		r.Get("/", home.GetIndexHandler)
-		r.Get("/detail/", home.GetDetailPost)
+		r.Get("/detailPage/", home.GetDetailPost)
 		/*r.Get("/create", home.GetCreatePostHandler)
 		r.Post("/new", home.PostNewPostHandler)*/
 	})
