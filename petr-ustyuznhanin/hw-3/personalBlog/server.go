@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 	"text/template"
+	"fmt"
 )
 
 type HomePage struct {
@@ -76,14 +77,14 @@ func (home *HomePage) GetDetailPost(w http.ResponseWriter, r *http.Request) {
 	templateMain.ExecuteTemplate(w, "Detail", DPage)
 }
 
-/*// PostPostHandler Создайте роут и шаблон для редактирования и создания материала.
-func (home *HomePage) GetCreatePostHandler(w http.ResponseWriter, r *http.Request) {
-	file, err := os.Open("./www/newPost.html")
+// 3. Создайте роут и шаблон для редактирования и создания материала.
+// GetCreateHandler отдает форму для создания нового поста в блоге
+func (home *HomePage) GetCreateHandler(w http.ResponseWriter, r *http.Request) {
+	file, err := os.Open("./www/createPage.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
-	defer file.Close()
 
 	data, err := ioutil.ReadAll(file)
 	if err != nil {
@@ -91,11 +92,12 @@ func (home *HomePage) GetCreatePostHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	templateMain := template.Must(template.New("personalBlog").Parse(string(data)))
-	templateMain.ExecuteTemplate(w, "personalBlog", home)
+	templateMain := template.Must(template.New("createPage").Parse(string(data)))
+	templateMain.ExecuteTemplate(w, "createPage", home)
 }
 
-func (home *HomePage) PostNewPostHandler(w http.ResponseWriter, r *http.Request) {
+// PostAddHandler добавляет новый пост в блог
+func (home *HomePage) PostAddHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	fmt.Println("New Post!")
 	fmt.Println(r.Form)
@@ -110,7 +112,10 @@ func (home *HomePage) PostNewPostHandler(w http.ResponseWriter, r *http.Request)
 	}
 	home.Posts = append(home.Posts, NewPost)
 	http.Redirect(w, r, "/", 301)
-}*/
+}
+
+// TODO: написать хэндлер для изменения поста
+// TODO: 4. * Добавьте к роуту редактирования и создания материала работу с Markdown с помощью пакета blackfriday.
 
 var home = HomePage{
 	Title: "Personal Blog!",
@@ -128,8 +133,8 @@ func main() {
 	route.Route("/", func(r chi.Router) {
 		r.Get("/", home.GetIndexHandler)
 		r.Get("/detailPage/", home.GetDetailPost)
-		/*r.Get("/create", home.GetCreatePostHandler)
-		r.Post("/new", home.PostNewPostHandler)*/
+		r.Get("/createPage", home.GetCreateHandler)
+		r.Post("/add", home.PostAddHandler)
 	})
 	http.ListenAndServe(":8080", route)
 }

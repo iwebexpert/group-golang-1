@@ -1,4 +1,4 @@
-{{define "newPost"}}
+{{define "createPage"}}
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -10,7 +10,7 @@
     <body>
     <a href="/" uk-icon="icon: home"></a>
     <div class="uk-card uk-card-default uk-card-body">
-        <form action="/new/" method="POST">
+        <form action="/add" method="POST">
             <input class="uk-input" type="text" name="Header" placeholder="Post Header"/>
             <input class="uk-input" type="text" name="text" placeholder="Post text"/>
             <input type="submit" class="uk-button uk-button-default">
