@@ -1,11 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"html/template"
 	"io/ioutil"
 	"math"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/go-chi/chi"
 )
@@ -41,6 +43,28 @@ func (server *Server) GetIndexHandler(w http.ResponseWriter, r *http.Request) {
 	templateMain.ExecuteTemplate(w, "managerList", server)
 }
 
+func (server *Server) PostTaskStatusHandler(w http.ResponseWriter, r *http.Request) {
+	taskIdString := chi.URLParam(r, "taskID")
+	taskStatusString := chi.URLParam(r, "status")
+
+	taskID, err := strconv.ParseInt(taskIdString, 10, 64)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	taskStatus, err := strconv.ParseBool(taskStatusString)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	server.Tasks[taskID].Completed = taskStatus
+	data, err := json.Marshal(server.Tasks[taskID])
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	w.Write(data)
+}
+
 func (tasks TaskItems) TaskWithStatus(completed bool) int {
 	total := 0
 	for _, task := range tasks {
@@ -69,6 +93,7 @@ func main() {
 
 	route.Route("/", func(r chi.Router) {
 		r.Get("/", server.GetIndexHandler)
+		r.Post("/{taskID}/{status}", server.PostTaskStatusHandler)
 	})
 	http.ListenAndServe(":8080", route)
 }
