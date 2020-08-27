@@ -1,0 +1,140 @@
+package controllers
+
+import (
+	"Lesson5/models"
+	"fmt"
+	"strconv"
+
+	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/orm"
+)
+
+type PostController struct {
+	beego.Controller
+}
+
+func (c *PostController) Get() {
+	beeOrm := orm.NewOrm()
+
+	posts := []models.Posts{}
+
+	_, err := beeOrm.QueryTable("Posts").All(&posts)
+	if err != nil {
+		c.Ctx.Output.SetStatus(400)
+		c.Ctx.Output.Body([]byte("Error getting Posts from BD"))
+	}
+	c.Data["Title"] = "Test title"
+	c.Data["Posts"] = posts
+	c.TplName = "posts.tpl"
+}
+
+func (c *PostController) GetOnePost() {
+	id := c.Ctx.Input.Param(":id")
+	uid64, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		c.Ctx.Output.SetStatus(400)
+		c.Ctx.Output.Body([]byte("Post id is incorrect1"))
+		return
+	}
+	beeOrm := orm.NewOrm()
+	post := models.Posts{Id: uid64}
+	err2 := beeOrm.QueryTable("Posts").Filter("Id", uid64).One(&post)
+	if err2 != nil {
+		c.Ctx.Output.SetStatus(400)
+		c.Ctx.Output.Body([]byte("Post id is incorrect2"))
+		return
+	}
+	c.Data["Title"] = "Test title"
+	c.Data["Posts"] = post
+	c.TplName = "post.tpl"
+}
+
+func (c *PostController) Post() {
+	req := struct {
+		Header string `form: "header"`
+		Text   string `form: "text"`
+	}{}
+	if err := c.ParseForm(&req); err != nil {
+		c.Ctx.Output.SetStatus(400)
+		c.Ctx.Output.Body([]byte("Body is empty"))
+		return
+	}
+
+	post, err := models.NewPost(req.Header, req.Text)
+	if err != nil {
+		c.Ctx.Output.SetStatus(400)
+		c.Ctx.Output.Body([]byte(err.Error()))
+		return
+	}
+
+	beeOrm := orm.NewOrm()
+
+	id, err := beeOrm.Insert(post)
+	if err != nil {
+		fmt.Println(err)
+		c.Ctx.Output.SetStatus(400)
+		c.Ctx.Output.Body([]byte("Error inserting post in BD"))
+		return
+	}
+	_ = id
+	c.Data["json"] = post
+	c.ServeJSON()
+}
+
+func (c *PostController) UpdatePost() {
+	req := struct {
+		Id     uint64 `form:"id"`
+		Header string `form: "header"`
+		Text   string `form: "text"`
+	}{}
+	if err := c.ParseForm(&req); err != nil {
+		c.Ctx.Output.SetStatus(400)
+		c.Ctx.Output.Body([]byte("Body is empty"))
+		return
+	}
+
+	post, err := models.ExPost(req.Header, req.Text, req.Id)
+	if err != nil {
+		c.Ctx.Output.SetStatus(400)
+		c.Ctx.Output.Body([]byte(err.Error()))
+		return
+	}
+	beeOrm := orm.NewOrm()
+
+	id, err := beeOrm.Update(post)
+	if err != nil {
+		c.Ctx.Output.SetStatus(400)
+		c.Ctx.Output.Body([]byte("Error updating post in BD"))
+		return
+	}
+	_ = id
+	c.Data["json"] = post
+	c.ServeJSON()
+}
+func (c *PostController) DeletePost() {
+	req := struct {
+		Id uint64 `form:"id"`
+	}{}
+	if err := c.ParseForm(&req); err != nil {
+		c.Ctx.Output.SetStatus(400)
+		c.Ctx.Output.Body([]byte("Body is empty"))
+		return
+	}
+	post, err := models.DelPost(req.Id)
+	if err != nil {
+		c.Ctx.Output.SetStatus(400)
+		c.Ctx.Output.Body([]byte(err.Error()))
+		return
+	}
+	beeOrm := orm.NewOrm()
+	fmt.Println(req.Id)
+	id, err := beeOrm.Delete(post)
+	if err != nil {
+		c.Ctx.Output.SetStatus(400)
+		c.Ctx.Output.Body([]byte("Error deleting post in BD"))
+		return
+	}
+	_ = id
+	c.Data["json"] = post
+	c.ServeJSON()
+}

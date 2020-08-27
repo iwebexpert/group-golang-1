@@ -15,7 +15,7 @@ type PostItem struct {
 type PostItemSlice []PostItem
 
 func GetAllPostItems(db *sql.DB) (PostItemSlice, error) {
-	row, err := db.Query("SELECT ID, Header, Text, Date FROM Posts")
+	row, err := db.Query("SELECT ID, Header, Text, Date FROM posts")
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func GetAllPostItems(db *sql.DB) (PostItemSlice, error) {
 }
 
 func GetPostItem(db *sql.DB, id int) (PostItemSlice, error) {
-	row, err := db.Query("SELECT ID, Header, Text, Date FROM Posts WHERE ID = ?", id)
+	row, err := db.Query("SELECT ID, Header, Text, Date FROM posts WHERE ID = ?", id)
 	if err != nil {
 		return nil, err
 	}
@@ -49,14 +49,14 @@ func GetPostItem(db *sql.DB, id int) (PostItemSlice, error) {
 }
 
 func (post *PostItem) Insert(db *sql.DB) error {
-	_, err := db.Exec("INSERT INTO Posts (Header, Text, Date) VALUES (?, ?, ?)", post.Header, post.Text, time.Now())
+	_, err := db.Exec("INSERT INTO posts (Header, Text, Date) VALUES (?, ?, ?)", post.Header, post.Text, time.Now())
 	return err
 }
 func (post *PostItem) Update(db *sql.DB) error {
-	_, err := db.Exec("UPDATE Posts SET Header=?, Text=?, Date=? WHERE ID = ?", post.Header, post.Text, time.Now(), post.ID)
+	_, err := db.Exec("UPDATE posts SET Header=?, Text=?, Date=? WHERE ID = ?", post.Header, post.Text, time.Now(), post.ID)
 	return err
 }
 func (post *PostItem) Delete(db *sql.DB) error {
-	_, err := db.Exec("DELETE FROM Posts WHERE ID = ?", post.ID)
+	_, err := db.Exec("DELETE FROM posts WHERE ID = ?", post.ID)
 	return err
 }
