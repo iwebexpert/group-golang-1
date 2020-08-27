@@ -8,11 +8,14 @@ import (
 	"io/ioutil"
 	"os"
 	"os/signal"
+	"strconv"
 
 	"snowrill/blog/core"
 
 	"github.com/go-chi/chi"
 )
+
+const DBpath = "static/data.json"
 
 type BlogServer struct {
 	Title string
@@ -20,28 +23,60 @@ type BlogServer struct {
 }
 
 func (b *BlogServer) IndexHandler(w http.ResponseWriter, r *http.Request) {
-	file, err := os.Open("static/index.html")
+	data, err := loadTemplate("static/index.html")
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
+	}
+
+	temp := template.Must(template.New("blogIndex").Parse(data))
+	temp.ExecuteTemplate(w, "blogIndex", b)
+}
+
+func (b *BlogServer) SinglePostHandler(w http.ResponseWriter, r *http.Request) {
+	
+	postId, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return
+	}
+
+	post, err := b.GetPostById(postId)
+	if err != nil {
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return
+	}
+
+	data, err := loadTemplate("static/singlepost.html")
+	if err != nil {
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return
+	}
+
+	temp := template.Must(template.New("singlePost").Parse(data))
+	temp.ExecuteTemplate(w, "singlePost", struct {
+		BlogTitle string
+		Post core.Post
+		} {
+			BlogTitle: b.Title,
+			Post: post,
+	})
+}
+
+
+func loadTemplate(path string) (string, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return "", err
 	}
 
 	data, err := ioutil.ReadAll(file)
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		return
+		return "", err
 	}
 
-	err = b.LoadPostsFrom("static/data.json")
-	if err != nil {
-		w.WriteHeader(http.StatusNoContent)
-		return
-	}
-
-	templateIndex := template.Must(template.New("blogIndex").Parse(string(data)))
-	templateIndex.ExecuteTemplate(w, "blogIndex", b)
+	return string(data), nil
 }
-
 
 func main() {
 	stopCh := make(chan os.Signal)
@@ -51,9 +86,9 @@ func main() {
 		Title: "Simple blog",
 	}
 
-	r.Route("/", func(r chi.Router) {
-		r.Get("/", blog.IndexHandler)
-	})
+	blog.LoadPostsFrom(DBpath)
+	r.Get("/", blog.IndexHandler)
+	r.Get("/post/{id}", blog.SinglePostHandler)
 
 	go func() {
 		log.Println("Server is running")

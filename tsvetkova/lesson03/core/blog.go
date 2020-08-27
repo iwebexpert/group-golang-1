@@ -2,8 +2,11 @@ package core
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 )
+
+var PostNotExistsError = errors.New("post does not exist")
 
 type Post struct {
 	Id			int		`json:"id"`
@@ -14,6 +17,15 @@ type Post struct {
 
 type BlogPosts struct {
 	Posts 		[]Post 	`json:"posts"`
+}
+
+func (bp *BlogPosts) GetPostById(id int) (Post, error) {
+	id--
+	if id < 0 || id >= len(bp.Posts) {
+		return Post{}, PostNotExistsError
+	}
+
+	return bp.Posts[id], nil
 }
 
 func (bp *BlogPosts) LoadPostsFrom(src string) error {
