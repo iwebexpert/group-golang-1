@@ -84,17 +84,23 @@ func (c *PostController) Post() {
 
 func (c *PostController) UpdatePost() {
 	req := struct {
-		Id     uint64 `json:"id"`
 		Header string `json: "header"`
 		Text   string `json: "text"`
 	}{}
+	id := c.Ctx.Input.Param(":id")
+	uid64, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		c.Ctx.Output.SetStatus(400)
+		c.Ctx.Output.Body([]byte("Post id is incorrect1"))
+		return
+	}
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &req); err != nil {
 		c.Ctx.Output.SetStatus(400)
 		c.Ctx.Output.Body([]byte("Body is empty"))
 		return
 	}
 
-	post, err := models.ExPost(req.Header, req.Text, req.Id)
+	post, err := models.ExPost(req.Header, req.Text, uid64)
 	if err != nil {
 		c.Ctx.Output.SetStatus(400)
 		c.Ctx.Output.Body([]byte(err.Error()))
@@ -102,41 +108,42 @@ func (c *PostController) UpdatePost() {
 	}
 	beeOrm := orm.NewOrm()
 
-	id, err := beeOrm.Update(post)
+	pid, err := beeOrm.Update(post)
 	if err != nil {
 		fmt.Println(err)
 		c.Ctx.Output.SetStatus(400)
 		c.Ctx.Output.Body([]byte("Error updating post in BD"))
 		return
 	}
-	_ = id
+	_ = pid
 	c.Data["json"] = post
 	c.ServeJSON()
 }
 func (c *PostController) DeletePost() {
-	req := struct {
-		Id uint64 `json:"id"`
-	}{}
-	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &req); err != nil {
+
+	id := c.Ctx.Input.Param(":id")
+	uid64, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
 		c.Ctx.Output.SetStatus(400)
-		c.Ctx.Output.Body([]byte("Body is empty"))
+		c.Ctx.Output.Body([]byte("Post id is incorrect1"))
 		return
 	}
-	post, err := models.DelPost(req.Id)
+
+	post, err := models.DelPost(uid64)
 	if err != nil {
 		c.Ctx.Output.SetStatus(400)
 		c.Ctx.Output.Body([]byte(err.Error()))
 		return
 	}
 	beeOrm := orm.NewOrm()
-	fmt.Println(req.Id)
-	id, err := beeOrm.Delete(post)
+	fmt.Println(uid64)
+	pid, err := beeOrm.Delete(post)
 	if err != nil {
 		c.Ctx.Output.SetStatus(400)
 		c.Ctx.Output.Body([]byte("Error deleting post in BD"))
 		return
 	}
-	_ = id
+	_ = pid
 	c.Data["json"] = post
 	c.ServeJSON()
 }
