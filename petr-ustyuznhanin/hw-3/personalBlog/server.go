@@ -1,13 +1,13 @@
 package main
 
 import (
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
 	"text/template"
-
-	"github.com/go-chi/chi"
 )
 
 type HomePage struct {
@@ -50,7 +50,34 @@ func (home *HomePage) GetIndexHandler(w http.ResponseWriter, r *http.Request) {
 
 // GetDetailPost : 2. Создайте роут и шаблон для просмотра конкретного поста в блоге.
 func (home *HomePage) GetDetailPost(w http.ResponseWriter, r *http.Request) {
-	file, err := os.Open("./www/post.html")
+
+	id, err := strconv.Atoi(chi.URLParam(r, "ID"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	for _, value := range home.Posts {
+		if id == value.ID {
+			file, err := os.Open("./www/detailPost.html")
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusNotFound)
+				return
+			}
+
+			data, err := ioutil.ReadAll(file)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusNotFound)
+				return
+			}
+			templateMain := template.Must(template.New("detailPost").Parse(string(data)))
+			templateMain.ExecuteTemplate(w, "detailPost", value)
+		}
+	}
+}
+
+/*// PostPostHandler Создайте роут и шаблон для редактирования и создания материала.
+func (home *HomePage) GetCreatePostHandler(w http.ResponseWriter, r *http.Request) {
+	file, err := os.Open("./www/newPost.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -63,26 +90,26 @@ func (home *HomePage) GetDetailPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	postID, err := strconv.Atoi(r.URL.Query().Get("ID"))
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	dPost := home.Posts[postID-1]
-	DetailedPost := PostPage{
-		Title: dPost.Header,
-		Post:  dPost,
-	}
-
-	templateMain := template.Must(template.New("post").Parse(string(data)))
-	templateMain.ExecuteTemplate(w, "post", DetailedPost)
+	templateMain := template.Must(template.New("personalBlog").Parse(string(data)))
+	templateMain.ExecuteTemplate(w, "personalBlog", home)
 }
 
-// PostPostHamdler Создайте роут и шаблон для редактирования и создания материала.
-func (home *HomePage) PostPostHandler(w http.ResponseWriter, r *http.Request) {
+func (home *HomePage) PostNewPostHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	fmt.Println("New Post!")
+	fmt.Println(r.Form)
+	nHead := r.Form["Header"][0]
+	nText := r.Form["text"][0]
 
-}
+	newID := len(home.Posts) + 1
+	NewPost := PostItem{
+		ID:     newID,
+		Text:   nText,
+		Header: nHead,
+	}
+	home.Posts = append(home.Posts, NewPost)
+	http.Redirect(w, r, "/", 301)
+}*/
 
 var home = HomePage{
 	Title: "Personal Blog!",
@@ -95,10 +122,13 @@ var home = HomePage{
 func main() {
 	route := chi.NewRouter()
 
+	route.Use(middleware.Logger)
+
 	route.Route("/", func(r chi.Router) {
 		r.Get("/", home.GetIndexHandler)
 		r.Get("/detail/", home.GetDetailPost)
-		r.Post("", home.PostPostHandler)
+		/*r.Get("/create", home.GetCreatePostHandler)
+		r.Post("/new", home.PostNewPostHandler)*/
 	})
 	http.ListenAndServe(":8080", route)
 }

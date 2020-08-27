@@ -22,9 +22,9 @@
     <ul class="uk-list">
         {{range $key, $val := .Posts}}
         <li>
-          <a style="display:block" href="detail/?ID={{.ID}}">
+          <a style="display:block" href="detailPost/?ID={{.ID}}">
             <div class="uk-card uk-card-default uk-card-body">
-              <span>{{.Header}}</span>  
+              <span>{{.Header}}</span>
                 <div class="uk-align-right">
                     {{range .Labels}}
                     <span class="uk-label">{{.}}</span>
@@ -36,6 +36,7 @@
         {{end}}
     </ul>
  </div>
+<a href="/newPost" class="uk-button uk-button-default">NEW Post</a>
 {{end}}
 
 
