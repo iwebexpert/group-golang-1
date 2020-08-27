@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"Lesson5/models"
+	"encoding/json"
 	"fmt"
 	"strconv"
 
@@ -51,10 +52,10 @@ func (c *PostController) GetOnePost() {
 
 func (c *PostController) Post() {
 	req := struct {
-		Header string `form: "header"`
-		Text   string `form: "text"`
+		Header string `json: "header"`
+		Text   string `json: "text"`
 	}{}
-	if err := c.ParseForm(&req); err != nil {
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &req); err != nil {
 		c.Ctx.Output.SetStatus(400)
 		c.Ctx.Output.Body([]byte("Body is empty"))
 		return
@@ -83,11 +84,11 @@ func (c *PostController) Post() {
 
 func (c *PostController) UpdatePost() {
 	req := struct {
-		Id     uint64 `form:"id"`
-		Header string `form: "header"`
-		Text   string `form: "text"`
+		Id     uint64 `json:"id"`
+		Header string `json: "header"`
+		Text   string `json: "text"`
 	}{}
-	if err := c.ParseForm(&req); err != nil {
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &req); err != nil {
 		c.Ctx.Output.SetStatus(400)
 		c.Ctx.Output.Body([]byte("Body is empty"))
 		return
@@ -103,6 +104,7 @@ func (c *PostController) UpdatePost() {
 
 	id, err := beeOrm.Update(post)
 	if err != nil {
+		fmt.Println(err)
 		c.Ctx.Output.SetStatus(400)
 		c.Ctx.Output.Body([]byte("Error updating post in BD"))
 		return
@@ -113,9 +115,9 @@ func (c *PostController) UpdatePost() {
 }
 func (c *PostController) DeletePost() {
 	req := struct {
-		Id uint64 `form:"id"`
+		Id uint64 `json:"id"`
 	}{}
-	if err := c.ParseForm(&req); err != nil {
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &req); err != nil {
 		c.Ctx.Output.SetStatus(400)
 		c.Ctx.Output.Body([]byte("Body is empty"))
 		return
