@@ -11,17 +11,18 @@ type Articles struct {
 	Tags    string `form:"art-tags"`
 }
 
+/*
 type GetForm struct {
 	Title   string `form:"art-title"`
 	Article string `form:"art-article"`
 	Tags    string `form:"art-tags"`
 }
-
+*/
 func (a *Articles) TableName() string {
 	return "articles"
 }
 
-func NewArticle(a *GetForm) (*Articles, error) {
+func NewArticle(a *Articles) (*Articles, error) {
 	//	if s.Article == "" {
 	//		return nil, fmt.Errorf("Empty article title")
 	//	}

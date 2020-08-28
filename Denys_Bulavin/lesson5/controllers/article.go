@@ -54,7 +54,7 @@ func (c *ArticleController) GetAddArticle() {
 
 func (c *ArticleController) PostAddArticle() {
 
-	var req models.GetForm
+	var req models.Articles
 
 	if err := c.ParseForm(&req); err != nil {
 		c.Ctx.Output.SetStatus(400)
@@ -146,31 +146,4 @@ func (c *ArticleController) PostUpdateArticle() {
 
 	_ = num
 	c.Redirect("/articles", 301)
-	/*
-		var req models.Articles
-
-		if err := c.ParseForm(&req); err != nil {
-			c.Ctx.Output.SetStatus(400)
-			c.Ctx.Output.Body([]byte("Body is empty"))
-			return
-		}
-
-		article, err := models.NewArticle(&req)
-		if err != nil {
-			c.Ctx.Output.SetStatus(400)
-			c.Ctx.Output.Body([]byte(err.Error()))
-			return
-		}
-		o := orm.NewOrm()
-		id, err := o.Update(&article)
-		if err != nil {
-			c.Ctx.Output.SetStatus(400)
-			c.Ctx.Output.Body([]byte(err.Error()))
-			return
-		}
-
-		_ = id
-
-		c.Redirect("/articles", 301)
-	*/
 }
