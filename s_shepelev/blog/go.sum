@@ -16,6 +16,7 @@ github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/Toringol/group-golang-1 v0.0.0-20200821084838-b4368839d377 h1:6Msi10T2Mg6by20Wep6ogRE9tFaF5p1sYnDXz2zwnEc=
 github.com/Toringol/group-golang-1 v0.0.0-20200821084838-b4368839d377/go.mod h1:4RBORkCRp3IS+XyCihpClzYDl4bwK5b+p+5k6bFaSIk=
+github.com/Toringol/group-golang-1 v0.0.0-20200828133720-dc26c7e1507d h1:6y0OQKWuXaImFHwmdIaofK1bJYz1oluoVobEYsk9g4s=
 github.com/Toringol/nonlinearity v0.0.0-20200419161811-7b797b1c65bf h1:IO054xU/24QyCR6JVdzbAo5nG5S2CjS+QPWhzBjauGI=
 github.com/Toringol/nonlinearity v0.0.0-20200419161811-7b797b1c65bf/go.mod h1:bnzerM+J/0Lfm2r10NwW3NsqJtEljG9JRKNCzS36gF4=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=

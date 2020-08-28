@@ -13,12 +13,12 @@ import (
 )
 
 var (
-	layoutTemplatePosts = template.Must(template.ParseFiles(path.Join("../templates", "layout.html"),
-		path.Join("../templates", "posts.html")))
-	layoutTemplateActualPost = template.Must(template.ParseFiles(path.Join("../templates", "layout.html"),
-		path.Join("../templates", "post.html")))
-	layoutTemplateAddPost = template.Must(template.ParseFiles(path.Join("../templates", "layout.html"),
-		path.Join("../templates", "newpost.html")))
+	layoutTemplatePosts = template.Must(template.ParseFiles(path.Join("../views", "layout.html"),
+		path.Join("../views", "posts.html")))
+	layoutTemplateActualPost = template.Must(template.ParseFiles(path.Join("../views", "layout.html"),
+		path.Join("../views", "post.html")))
+	layoutTemplateAddPost = template.Must(template.ParseFiles(path.Join("../views", "layout.html"),
+		path.Join("../views", "newPost.html")))
 )
 
 // blogHandlers - http handlers structure
@@ -33,7 +33,8 @@ func NewBlogHandler(e *echo.Echo, us blog.Usecase) {
 	// Blog handlers
 	e.GET("/", handlers.getAllPostsHandlers)
 	e.GET("/posts/:postID", handlers.getPostInfoHandler)
-	e.POST("/posts/:postID", handlers.changePostHandler)
+	e.PUT("/posts/:postID", handlers.changePostHandler)
+	e.DELETE("/posts/:postID", handlers.deletePostHandler)
 	e.GET("/addPost", handlers.getNewPostHandler)
 	e.POST("/addPost", handlers.createNewPostHandler)
 }
@@ -48,7 +49,7 @@ func (bh *blogHandlers) getAllPostsHandlers(ctx echo.Context) error {
 		echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
 	}
 
-	return ctx.JSON(http.StatusOK, "")
+	return nil
 }
 
 func (bh *blogHandlers) getPostInfoHandler(ctx echo.Context) error {
@@ -66,7 +67,7 @@ func (bh *blogHandlers) getPostInfoHandler(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
 	}
 
-	return ctx.JSON(http.StatusOK, "")
+	return nil
 }
 
 func (bh *blogHandlers) changePostHandler(ctx echo.Context) error {
@@ -104,7 +105,21 @@ func (bh *blogHandlers) changePostHandler(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
 	}
 
-	return ctx.JSON(http.StatusCreated, "")
+	return ctx.JSON(http.StatusCreated, nil)
+}
+
+func (bh *blogHandlers) deletePostHandler(ctx echo.Context) error {
+	postID, err := strconv.ParseInt(ctx.Param("postID"), 10, 64)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
+	}
+
+	_, err = bh.usecase.DeletePost(postID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
+	}
+
+	return ctx.JSON(http.StatusOK, nil)
 }
 
 func (bh *blogHandlers) getNewPostHandler(ctx echo.Context) error {
@@ -112,7 +127,7 @@ func (bh *blogHandlers) getNewPostHandler(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
 	}
 
-	return ctx.JSON(http.StatusOK, "")
+	return nil
 }
 
 func (bh *blogHandlers) createNewPostHandler(ctx echo.Context) error {
@@ -129,5 +144,5 @@ func (bh *blogHandlers) createNewPostHandler(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
 	}
 
-	return ctx.JSON(http.StatusCreated, "")
+	return ctx.JSON(http.StatusCreated, nil)
 }

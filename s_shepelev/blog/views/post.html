@@ -8,6 +8,7 @@
                     <h3>{{.Title}}</h3>
                     <p>{{.Description}}</p>
                 </div>
+                <button class="uk-button uk-button-danger uk-margin uk-align-right" id="DeletePost">Delete Post</button>
             </div>
         </div>
         <div>
@@ -22,6 +23,23 @@
 </div>
 
 <script>
+    document.getElementById("DeletePost").addEventListener("click", () => {
+        let url = document.URL
+
+        let req = fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        }).
+            then((response) => {
+                if (response.status === 200) {
+                    window.history.pushState({page: '/'}, null, '/');
+                    window.location.reload();
+                }
+            })
+    });
+
     document.getElementById("SavePost").addEventListener("click", () => {
         let url = document.URL
         let title = document.getElementById("PostTitle").value;
@@ -38,7 +56,7 @@
         }
 
         let req = fetch(url, {
-            method: 'POST',
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
