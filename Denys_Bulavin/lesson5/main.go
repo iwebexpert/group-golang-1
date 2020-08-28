@@ -8,11 +8,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-type GetForm struct {
-	Title   string `form:"art-title"`
-	Article string `form:"art-article"`
-	Tags    string `form:"art-tags"`
-}
+
 
 func main() {
 

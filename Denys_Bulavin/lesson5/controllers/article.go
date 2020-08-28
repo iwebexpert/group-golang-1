@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"lesson5/models"
 	"log"
 	"strconv"
@@ -103,4 +104,73 @@ func (c *ArticleController) Delete() {
 	}
 
 	c.Redirect("/articles", 301)
+}
+
+func (c *ArticleController) GetUpdateArticle() {
+	id := c.Ctx.Input.Param(":id")
+	uid64, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		c.Ctx.Output.SetStatus(400)
+		c.Ctx.Output.Body([]byte("Article id is incorect"))
+	}
+
+	c.Data["id"] = uid64
+	c.TplName = "updatepost.tpl"
+}
+
+func (c *ArticleController) PostUpdateArticle() {
+	id := c.Ctx.Input.Param(":id")
+	uid64, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		c.Ctx.Output.SetStatus(400)
+		c.Ctx.Output.Body([]byte("Article id is incorect"))
+	}
+
+	o := orm.NewOrm()
+
+	article := models.Articles{Id: uid64}
+
+	if err := c.ParseForm(&article); err != nil {
+		c.Ctx.Output.SetStatus(400)
+		c.Ctx.Output.Body([]byte("Body is empty"))
+		return
+	}
+	fmt.Println(article)
+
+	num, err := o.Update(&article)
+	if err != nil {
+		c.Ctx.Output.SetStatus(400)
+		c.Ctx.Output.Body([]byte(err.Error()))
+		return
+	}
+
+	_ = num
+	c.Redirect("/articles", 301)
+	/*
+		var req models.Articles
+
+		if err := c.ParseForm(&req); err != nil {
+			c.Ctx.Output.SetStatus(400)
+			c.Ctx.Output.Body([]byte("Body is empty"))
+			return
+		}
+
+		article, err := models.NewArticle(&req)
+		if err != nil {
+			c.Ctx.Output.SetStatus(400)
+			c.Ctx.Output.Body([]byte(err.Error()))
+			return
+		}
+		o := orm.NewOrm()
+		id, err := o.Update(&article)
+		if err != nil {
+			c.Ctx.Output.SetStatus(400)
+			c.Ctx.Output.Body([]byte(err.Error()))
+			return
+		}
+
+		_ = id
+
+		c.Redirect("/articles", 301)
+	*/
 }

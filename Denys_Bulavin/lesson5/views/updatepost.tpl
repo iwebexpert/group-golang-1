@@ -8,9 +8,9 @@
 <body>
     <div >
         <div>
-            <form id="query_form" class="form-horizontal form-well" role="form" action="/add" method="post">
+            <form class="form-horizontal form-well" role="form" action="/article/update/{{.id}}" method="post">
             <div>Заголовок</div>
-            <div><input type="text" id="title" name="art-title"></div>
+            <div><input type="text" id="title" name="art-title">{{.Articles.Title}}</div>
             <div>Текст</div>
             <div><textarea type="textarea" id="article" name="art-article"></textarea></div>
             <div>Тэги</div>

@@ -6,9 +6,9 @@ import (
 
 type Articles struct {
 	Id      uint64
-	Title   string
-	Article string
-	Tags    string
+	Title   string `form:"art-title"`
+	Article string `form:"art-article"`
+	Tags    string `form:"art-tags"`
 }
 
 type GetForm struct {
