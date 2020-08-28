@@ -13,17 +13,32 @@
         <script src="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/js/uikit-icons.min.js"></script>
     </head>
     <body>
-        <div class="uk-section uk-section-muted">
-            <div class="uk-container">
-                <h1 class="uk-heading-small uk-align-center">{{.BlogTitle}}</h1>
+        <nav class="uk-navbar-container uk-margin" uk-navbar>
+            <div class="uk-navbar-left">
+
+                <a class="uk-navbar-item uk-logo" href="/">{{.BlogTitle}}</a>
+
+                <ul class="uk-navbar-nav">
+                    <li>
+                        <a href="/posts/add">
+                            <button class="uk-button uk-button-primary">
+                                Добавить запись
+                                <span class="uk-icon uk-margin-small-left" uk-icon="icon: plus"></span>
+                            </button>
+                        </a>
+                    </li>
+                </ul>
             </div>
-        </div>
+        </nav>
         <div class="uk-container uk-margin-medium-top">
             <h2 class="uk-card-title">
                 {{ .Post.Title }}
             </h2>
             <div>
                 {{ .Post.Text }}
+            </div>
+            <div class="uk-align-right">
+                <a href="/posts/{{ .Post.Id }}/edit">Редактировать</a>
             </div>
         </div>
     </body>

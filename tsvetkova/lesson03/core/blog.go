@@ -6,7 +6,10 @@ import (
 	"io/ioutil"
 )
 
-var PostNotExistsError = errors.New("post does not exist")
+var (
+	PostNotExistsError = errors.New("post does not exist")
+	EmptyFieldsError = errors.New("one or more required fileds are empty")
+)
 
 type Post struct {
 	Id			int		`json:"id"`
@@ -35,7 +38,7 @@ func (bp *BlogPosts) GetPostById(id int) (Post, error) {
 	return bp.Posts[id], nil
 }
 
-func (bp *BlogPosts) LoadPostsFrom(src string) error {
+func (bp *BlogPosts) Load(src string) error {
 	b, err := ioutil.ReadFile(src)
 	if err != nil {
 		return err
@@ -49,8 +52,27 @@ func (bp *BlogPosts) LoadPostsFrom(src string) error {
 	return nil
 }
 
-func (bp *BlogPosts) AddPost(title, text string) int {
-	id := len(bp.Posts)
+func (bp *BlogPosts) Save(dst string) error {
+	data, err := json.Marshal(bp)
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile(dst, data, 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (bp *BlogPosts) AddPost(title, text string) (int, error) {
+
+	if title == "" || text == "" {
+		return -1, EmptyFieldsError
+	}
+
+	id := len(bp.Posts)+1
 	post := Post{
 		Id: id,
 		Title: title,
@@ -58,7 +80,7 @@ func (bp *BlogPosts) AddPost(title, text string) int {
 	}
 
 	bp.Posts = append(bp.Posts, post)
-	return id+1
+	return id, nil
 }
 
 func (bp *BlogPosts) EditPost(id int, newTitle, newText string) error {

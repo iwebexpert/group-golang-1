@@ -23,18 +23,20 @@ type BlogServer struct {
 }
 
 func (b *BlogServer) IndexHandler(w http.ResponseWriter, r *http.Request) {
+	b.Load(DBpath)
 	data, err := loadTemplate("static/index.html")
 	if err != nil {
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
 
+
 	temp := template.Must(template.New("blogIndex").Parse(data))
 	temp.ExecuteTemplate(w, "blogIndex", b)
 }
 
 func (b *BlogServer) SinglePostHandler(w http.ResponseWriter, r *http.Request) {
-	
+	b.Load(DBpath)
 	postId, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
@@ -64,6 +66,7 @@ func (b *BlogServer) SinglePostHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (b *BlogServer) LoadAddForm(w http.ResponseWriter, r *http.Request) {
+	b.Load(DBpath)
 	data, err := loadTemplate("static/addpost.html")
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
@@ -75,6 +78,7 @@ func (b *BlogServer) LoadAddForm(w http.ResponseWriter, r *http.Request) {
 }
 
 func (b *BlogServer) LoadEditForm(w http.ResponseWriter, r *http.Request) {
+	b.Load(DBpath)
 	data, err := loadTemplate("static/editpost.html")
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
@@ -104,6 +108,7 @@ func (b *BlogServer) LoadEditForm(w http.ResponseWriter, r *http.Request) {
 }
 
 func (b *BlogServer) EditPostHandler(w http.ResponseWriter, r *http.Request) {
+	b.Load(DBpath)
 	postId, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
@@ -119,17 +124,24 @@ func (b *BlogServer) EditPostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	b.Save(DBpath)
 	http.Redirect(w, r, "/", 301)
 }
 
 func (b *BlogServer) AddPostHandler(w http.ResponseWriter, r *http.Request) {
+	b.Load(DBpath)
 	r.ParseForm()
 	title := r.Form.Get("title")
 	text := r.Form.Get("text")
 
-	id := b.AddPost(title, text)
-	url := fmt.Sprintf("/post/%d", id)
+	id, err := b.AddPost(title, text) 
+	if err != nil {
+		http.Redirect(w, r, "/posts/add", 301)
+		return
+	}
+	url := fmt.Sprintf("/posts/%d", id)
 
+	b.Save(DBpath)
 	http.Redirect(w, r, url, 301)
 }
 
@@ -154,8 +166,8 @@ func main() {
 	blog := BlogServer{
 		BlogTitle: "Simple blog",
 	}
+	blog.Load(DBpath)
 
-	blog.LoadPostsFrom(DBpath)
 	r.Get("/", blog.IndexHandler)
 
 	r.Route("/posts/{id}", func(r chi.Router){
