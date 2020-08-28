@@ -3,22 +3,12 @@ package http
 import (
 	"html/template"
 	"net/http"
-	"path"
 	"strconv"
 
 	"github.com/Toringol/group-golang-1/tree/master/s_shepelev/blog/app/blog"
 	"github.com/Toringol/group-golang-1/tree/master/s_shepelev/blog/app/model"
 	"github.com/labstack/echo/v4"
 	"github.com/russross/blackfriday"
-)
-
-var (
-	layoutTemplatePosts = template.Must(template.ParseFiles(path.Join("../templates", "layout.html"),
-		path.Join("../templates", "posts.html")))
-	layoutTemplateActualPost = template.Must(template.ParseFiles(path.Join("../templates", "layout.html"),
-		path.Join("../templates", "post.html")))
-	layoutTemplateAddPost = template.Must(template.ParseFiles(path.Join("../templates", "layout.html"),
-		path.Join("../templates", "newpost.html")))
 )
 
 // blogHandlers - http handlers structure
@@ -33,7 +23,8 @@ func NewBlogHandler(e *echo.Echo, us blog.Usecase) {
 	// Blog handlers
 	e.GET("/", handlers.getAllPostsHandlers)
 	e.GET("/posts/:postID", handlers.getPostInfoHandler)
-	e.POST("/posts/:postID", handlers.changePostHandler)
+	e.PUT("/posts/:postID", handlers.changePostHandler)
+	e.DELETE("/posts/:postID", handlers.deletePostHandler)
 	e.GET("/addPost", handlers.getNewPostHandler)
 	e.POST("/addPost", handlers.createNewPostHandler)
 }
@@ -44,11 +35,7 @@ func (bh *blogHandlers) getAllPostsHandlers(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
 	}
 
-	if err := layoutTemplatePosts.ExecuteTemplate(ctx.Response(), "layout", posts); err != nil {
-		echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
-	}
-
-	return ctx.JSON(http.StatusOK, "")
+	return ctx.Render(http.StatusOK, "posts", posts)
 }
 
 func (bh *blogHandlers) getPostInfoHandler(ctx echo.Context) error {
@@ -62,11 +49,7 @@ func (bh *blogHandlers) getPostInfoHandler(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
 	}
 
-	if err := layoutTemplateActualPost.ExecuteTemplate(ctx.Response(), "layout", post); err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
-	}
-
-	return ctx.JSON(http.StatusOK, "")
+	return ctx.Render(http.StatusOK, "post", post)
 }
 
 func (bh *blogHandlers) changePostHandler(ctx echo.Context) error {
@@ -104,15 +87,25 @@ func (bh *blogHandlers) changePostHandler(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
 	}
 
-	return ctx.JSON(http.StatusCreated, "")
+	return ctx.JSON(http.StatusCreated, nil)
 }
 
-func (bh *blogHandlers) getNewPostHandler(ctx echo.Context) error {
-	if err := layoutTemplateAddPost.ExecuteTemplate(ctx.Response(), "layout", ""); err != nil {
+func (bh *blogHandlers) deletePostHandler(ctx echo.Context) error {
+	postID, err := strconv.ParseInt(ctx.Param("postID"), 10, 64)
+	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
 	}
 
-	return ctx.JSON(http.StatusOK, "")
+	_, err = bh.usecase.DeletePost(postID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
+	}
+
+	return ctx.JSON(http.StatusOK, nil)
+}
+
+func (bh *blogHandlers) getNewPostHandler(ctx echo.Context) error {
+	return ctx.Render(http.StatusOK, "newPost", nil)
 }
 
 func (bh *blogHandlers) createNewPostHandler(ctx echo.Context) error {
@@ -129,5 +122,5 @@ func (bh *blogHandlers) createNewPostHandler(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
 	}
 
-	return ctx.JSON(http.StatusCreated, "")
+	return ctx.JSON(http.StatusCreated, nil)
 }
