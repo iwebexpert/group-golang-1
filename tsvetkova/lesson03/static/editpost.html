@@ -1,4 +1,4 @@
-{{define "blogIndex"}}
+{{define "editPost"}}
 <!DOCTYPE html>
 <html>
     <head>
@@ -19,26 +19,27 @@
             </div>
         </div>
         <div class="uk-container uk-margin-medium-top">
+            <form method="post">
+                <fieldset class="uk-fieldset">
 
-            {{range .Posts}}
-                {{template "postEntry" .}}
-            {{else}}
-                <p>No posts found</p>
-            {{end}}
+                    <legend class="uk-legend">Редактировать пост</legend>
 
+                    <div class="uk-margin">
+                        <input class="uk-input" type="text" placeholder="Заголовок" name="title" value="{{.Post.Title}}">
+                    </div>
+
+
+                    <div class="uk-margin">
+                        <textarea class="uk-textarea" rows="5" placeholder="Текст поста" name="text">{{.Post.Text}}</textarea>
+                    </div>
+
+                    <div class="uk-margin">
+                        <button type="submit" class="uk-button uk-button-primary uk-button-large">Сохранить</button>
+                    </div>
+
+                </fieldset>
+            </form>
         </div>
     </body>
 </html>
-{{end}}
-
-{{ define "postEntry"}}
-<div class="uk-card uk-card-default uk-card-body uk-margin-medium-bottom">
-    <h2 class="uk-card-title">
-        <a href="/posts/{{.Id}}">{{.Title}}</a>
-    </h2>
-    <div class="article-body">
-        {{.Text}}
-    </div>
-    <!-- <time class="uk-align-right uk-text-muted">28.08.2020 19:03</time> -->
-</div>
 {{end}}

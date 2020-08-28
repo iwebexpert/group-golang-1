@@ -74,6 +74,54 @@ func (b *BlogServer) LoadAddForm(w http.ResponseWriter, r *http.Request) {
 	temp.ExecuteTemplate(w, "addPost", b)
 }
 
+func (b *BlogServer) LoadEditForm(w http.ResponseWriter, r *http.Request) {
+	data, err := loadTemplate("static/editpost.html")
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	postId, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return
+	}
+
+	post, err := b.GetPostById(postId)
+	if err != nil {
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return
+	}
+
+	temp := template.Must(template.New("editPost").Parse(data))
+	temp.ExecuteTemplate(w, "editPost", struct{
+		BlogTitle string
+		Post 	  core.Post
+	}{
+		BlogTitle: b.BlogTitle,
+		Post: post,
+	})
+}
+
+func (b *BlogServer) EditPostHandler(w http.ResponseWriter, r *http.Request) {
+	postId, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return
+	}
+
+	r.ParseForm()
+	title := r.Form.Get("title")
+	text := r.Form.Get("text")
+
+	err = b.EditPost(postId, title, text)
+	if err != nil {
+		return
+	}
+
+	http.Redirect(w, r, "/", 301)
+}
+
 func (b *BlogServer) AddPostHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	title := r.Form.Get("title")
@@ -109,9 +157,15 @@ func main() {
 
 	blog.LoadPostsFrom(DBpath)
 	r.Get("/", blog.IndexHandler)
-	r.Get("/post/{id}", blog.SinglePostHandler)
 
-	r.Route("/post/add", func(r chi.Router) {
+	r.Route("/posts/{id}", func(r chi.Router){
+		r.Get("/", blog.SinglePostHandler)
+		r.Get("/edit", blog.LoadEditForm)
+		r.Post("/edit", blog.EditPostHandler)
+	})
+
+
+	r.Route("/posts/add", func(r chi.Router) {
 		r.Get("/", blog.LoadAddForm)
 		r.Post("/", blog.AddPostHandler)
 	})

@@ -19,9 +19,16 @@ type BlogPosts struct {
 	Posts 		[]Post 	`json:"posts"`
 }
 
+func (bp *BlogPosts) PostExists(id int) bool {
+	if id < 0 || id >= len(bp.Posts) {
+		return false
+	}
+	return true
+}
+
 func (bp *BlogPosts) GetPostById(id int) (Post, error) {
 	id--
-	if id < 0 || id >= len(bp.Posts) {
+	if !bp.PostExists(id) {
 		return Post{}, PostNotExistsError
 	}
 
@@ -52,4 +59,18 @@ func (bp *BlogPosts) AddPost(title, text string) int {
 
 	bp.Posts = append(bp.Posts, post)
 	return id+1
+}
+
+func (bp *BlogPosts) EditPost(id int, newTitle, newText string) error {
+	id--
+	if !bp.PostExists(id) {
+		return PostNotExistsError
+	}
+
+	bp.Posts[id] = Post{
+		Title: newTitle,
+		Text: newText,
+	}
+
+	return nil
 }
