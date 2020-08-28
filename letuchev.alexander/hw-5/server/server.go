@@ -23,7 +23,7 @@ type BlogServer struct {
 
 //New --
 func New(title string, db *sql.DB, gormdb *gorm.DB) (*BlogServer, error) {
-	posts, err := models.Retrieve(db)
+	posts, err := models.Retrieve(gormdb)
 	if err != nil {
 		return nil, err
 	}

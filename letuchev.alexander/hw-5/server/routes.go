@@ -31,7 +31,7 @@ func (srv *BlogServer) defineRoutes() {
 
 //BlogReload -
 func (srv *BlogServer) BlogReload(w http.ResponseWriter, r *http.Request) {
-	posts, err := models.Retrieve(srv.DBlink)
+	posts, err := models.Retrieve(srv.DBlinkORM)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -106,7 +106,7 @@ func (srv *BlogServer) PostDelete(w http.ResponseWriter, r *http.Request) {
 	_ = json.Unmarshal(data, &post)
 	post.ID = int(postID)
 
-	if err := srv.Posts.DeleteBlogPost(srv.DBlink, post.ID); err != nil {
+	if err := srv.Posts.DeleteBlogPost(srv.DBlinkORM, post.ID); err != nil {
 		fmt.Println(err)
 		return
 	}
@@ -124,7 +124,7 @@ func (srv *BlogServer) PostUpdate(w http.ResponseWriter, r *http.Request) {
 	_ = json.Unmarshal(data, &post)
 	post.ID = int(postID)
 
-	if err := srv.Posts.UpdateBlogPost(srv.DBlink, post.ID, post.About, post.Text, post.Labels); err != nil {
+	if err := srv.Posts.UpdateBlogPost(srv.DBlinkORM, post.ID, post.About, post.Text, post.Labels); err != nil {
 		fmt.Println(err)
 		return
 	} else {
