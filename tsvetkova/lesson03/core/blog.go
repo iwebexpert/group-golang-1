@@ -66,6 +66,15 @@ func (bp *BlogPosts) Save(dst string) error {
 	return nil
 }
 
+func (bp *BlogPosts) Reverse() []Post {
+	result := []Post{}
+	for i := len(bp.Posts)-1; i >= 0; i-- {
+		result = append(result, bp.Posts[i])
+	}
+
+	return result
+}
+
 func (bp *BlogPosts) AddPost(title, text string) (int, error) {
 
 	if title == "" || text == "" {

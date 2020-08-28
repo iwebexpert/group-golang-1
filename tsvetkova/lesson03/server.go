@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
 	"net/http"
 	"log"
@@ -134,15 +133,14 @@ func (b *BlogServer) AddPostHandler(w http.ResponseWriter, r *http.Request) {
 	title := r.Form.Get("title")
 	text := r.Form.Get("text")
 
-	id, err := b.AddPost(title, text) 
+	_, err := b.AddPost(title, text) 
 	if err != nil {
 		http.Redirect(w, r, "/posts/add", 301)
 		return
 	}
-	url := fmt.Sprintf("/posts/%d", id)
 
 	b.Save(DBpath)
-	http.Redirect(w, r, url, 301)
+	http.Redirect(w, r, "/", 301)
 }
 
 func loadTemplate(path string) (string, error) {

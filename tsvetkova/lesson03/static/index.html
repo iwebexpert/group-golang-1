@@ -32,7 +32,7 @@
         </nav>
         <div class="uk-container uk-margin-medium-top">
 
-            {{range .Posts}}
+            {{range .Reverse}}
                 {{template "postEntry" .}}
             {{else}}
                 <p>No posts found</p>
