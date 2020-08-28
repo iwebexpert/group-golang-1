@@ -2,14 +2,14 @@ package main
 
 import (
 	"log"
-	"net/http"
 
 	bloghttp "github.com/Toringol/group-golang-1/tree/master/s_shepelev/blog/app/blog/delivery/http"
 	"github.com/Toringol/group-golang-1/tree/master/s_shepelev/blog/app/blog/repository"
 	"github.com/Toringol/group-golang-1/tree/master/s_shepelev/blog/app/blog/usecase"
 	"github.com/Toringol/group-golang-1/tree/master/s_shepelev/blog/config"
-	"github.com/go-chi/chi"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/spf13/viper"
 )
 
@@ -18,14 +18,15 @@ func main() {
 		log.Fatalf("%s", err.Error())
 	}
 
-	router := chi.NewRouter()
+	listenAddr := viper.GetString("listenAddr")
 
-	bloghttp.NewBlogHandler(router, usecase.NewBlogUsecase(repository.NewBlogMemoryRepository()))
+	e := echo.New()
 
-	log.Println("Server start")
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Format: "${time_rfc3339} [${method}] ${remote_ip}, ${uri} ${status} 'error':'${error}'\n",
+	}))
 
-	err := http.ListenAndServe(viper.GetString("listenPort"), router)
-	if err != nil {
-		log.Fatal(err)
-	}
+	bloghttp.NewBlogHandler(e, usecase.NewBlogUsecase(repository.NewBlogMemoryRepository()))
+
+	e.Logger.Fatal(e.Start(listenAddr))
 }
