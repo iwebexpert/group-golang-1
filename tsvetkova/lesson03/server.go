@@ -1,7 +1,7 @@
 package main
 
 import (
-	// "fmt"
+	"fmt"
 	"html/template"
 	"net/http"
 	"log"
@@ -18,7 +18,7 @@ import (
 const DBpath = "static/data.json"
 
 type BlogServer struct {
-	Title string
+	BlogTitle string
 	core.BlogPosts
 }
 
@@ -58,11 +58,32 @@ func (b *BlogServer) SinglePostHandler(w http.ResponseWriter, r *http.Request) {
 		BlogTitle string
 		Post core.Post
 		} {
-			BlogTitle: b.Title,
+			BlogTitle: b.BlogTitle,
 			Post: post,
 	})
 }
 
+func (b *BlogServer) LoadAddForm(w http.ResponseWriter, r *http.Request) {
+	data, err := loadTemplate("static/addpost.html")
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	temp := template.Must(template.New("addPost").Parse(data))
+	temp.ExecuteTemplate(w, "addPost", b)
+}
+
+func (b *BlogServer) AddPostHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	title := r.Form.Get("title")
+	text := r.Form.Get("text")
+
+	id := b.AddPost(title, text)
+	url := fmt.Sprintf("/post/%d", id)
+
+	http.Redirect(w, r, url, 301)
+}
 
 func loadTemplate(path string) (string, error) {
 	file, err := os.Open(path)
@@ -83,12 +104,17 @@ func main() {
 	r := chi.NewRouter()
 
 	blog := BlogServer{
-		Title: "Simple blog",
+		BlogTitle: "Simple blog",
 	}
 
 	blog.LoadPostsFrom(DBpath)
 	r.Get("/", blog.IndexHandler)
 	r.Get("/post/{id}", blog.SinglePostHandler)
+
+	r.Route("/post/add", func(r chi.Router) {
+		r.Get("/", blog.LoadAddForm)
+		r.Post("/", blog.AddPostHandler)
+	})
 
 	go func() {
 		log.Println("Server is running")

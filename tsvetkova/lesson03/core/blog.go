@@ -41,3 +41,15 @@ func (bp *BlogPosts) LoadPostsFrom(src string) error {
 
 	return nil
 }
+
+func (bp *BlogPosts) AddPost(title, text string) int {
+	id := len(bp.Posts)
+	post := Post{
+		Id: id,
+		Title: title,
+		Text: text,
+	}
+
+	bp.Posts = append(bp.Posts, post)
+	return id+1
+}
