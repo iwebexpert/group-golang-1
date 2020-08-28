@@ -11,7 +11,8 @@ import (
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	file, err := ioutil.ReadFile("./pages/index.html")
 	if err != nil {
-		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError) //Ошибка 500
+		return
 	}
 	w.Write(file)
 }
