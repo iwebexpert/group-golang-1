@@ -11,14 +11,13 @@ import (
 
 func main() {
 	gormdb, err := gorm.Open("postgres", "user=blogdb_adm password=sys host=193.168.0.99 port=5432 database=blogdb")
-	db := gormdb.DB()
 	if err != nil {
 		fmt.Println("Не удалось соединиться с БД", err)
 		return
 	}
 	defer gormdb.Close()
 
-	srv, err := server.New("Учебный блог ice65537", db, gormdb)
+	srv, err := server.New("Учебный блог ice65537", gormdb)
 	if err != nil {
 		fmt.Println("Ошибка создания сервера", err)
 		return

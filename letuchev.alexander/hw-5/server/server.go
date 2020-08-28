@@ -2,7 +2,6 @@ package server
 
 import (
 	"blog/models"
-	"database/sql"
 	"fmt"
 	"net/http"
 	"os"
@@ -16,13 +15,12 @@ import (
 type BlogServer struct {
 	Title     string
 	Posts     models.BlogPostArray
-	DBlink    *sql.DB
 	DBlinkORM *gorm.DB
 	router    *chi.Mux
 }
 
 //New --
-func New(title string, db *sql.DB, gormdb *gorm.DB) (*BlogServer, error) {
+func New(title string, gormdb *gorm.DB) (*BlogServer, error) {
 	posts, err := models.Retrieve(gormdb)
 	if err != nil {
 		return nil, err
@@ -30,7 +28,6 @@ func New(title string, db *sql.DB, gormdb *gorm.DB) (*BlogServer, error) {
 
 	srv := &BlogServer{
 		Title:     title,
-		DBlink:    db,
 		DBlinkORM: gormdb,
 		Posts:     *posts,
 		router:    chi.NewRouter(),
