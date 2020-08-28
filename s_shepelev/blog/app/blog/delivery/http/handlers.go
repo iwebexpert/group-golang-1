@@ -3,22 +3,12 @@ package http
 import (
 	"html/template"
 	"net/http"
-	"path"
 	"strconv"
 
 	"github.com/Toringol/group-golang-1/tree/master/s_shepelev/blog/app/blog"
 	"github.com/Toringol/group-golang-1/tree/master/s_shepelev/blog/app/model"
 	"github.com/labstack/echo/v4"
 	"github.com/russross/blackfriday"
-)
-
-var (
-	layoutTemplatePosts = template.Must(template.ParseFiles(path.Join("../views", "layout.html"),
-		path.Join("../views", "posts.html")))
-	layoutTemplateActualPost = template.Must(template.ParseFiles(path.Join("../views", "layout.html"),
-		path.Join("../views", "post.html")))
-	layoutTemplateAddPost = template.Must(template.ParseFiles(path.Join("../views", "layout.html"),
-		path.Join("../views", "newPost.html")))
 )
 
 // blogHandlers - http handlers structure
@@ -45,11 +35,7 @@ func (bh *blogHandlers) getAllPostsHandlers(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
 	}
 
-	if err := layoutTemplatePosts.ExecuteTemplate(ctx.Response(), "layout", posts); err != nil {
-		echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
-	}
-
-	return nil
+	return ctx.Render(http.StatusOK, "posts", posts)
 }
 
 func (bh *blogHandlers) getPostInfoHandler(ctx echo.Context) error {
@@ -63,11 +49,7 @@ func (bh *blogHandlers) getPostInfoHandler(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
 	}
 
-	if err := layoutTemplateActualPost.ExecuteTemplate(ctx.Response(), "layout", post); err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
-	}
-
-	return nil
+	return ctx.Render(http.StatusOK, "post", post)
 }
 
 func (bh *blogHandlers) changePostHandler(ctx echo.Context) error {
@@ -123,11 +105,7 @@ func (bh *blogHandlers) deletePostHandler(ctx echo.Context) error {
 }
 
 func (bh *blogHandlers) getNewPostHandler(ctx echo.Context) error {
-	if err := layoutTemplateAddPost.ExecuteTemplate(ctx.Response(), "layout", ""); err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
-	}
-
-	return nil
+	return ctx.Render(http.StatusOK, "newPost", nil)
 }
 
 func (bh *blogHandlers) createNewPostHandler(ctx echo.Context) error {
