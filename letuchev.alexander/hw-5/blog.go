@@ -4,7 +4,6 @@ import (
 	"blog/server"
 	"fmt"
 
-	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
