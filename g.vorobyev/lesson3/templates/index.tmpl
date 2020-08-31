@@ -1,0 +1,12 @@
+<html>
+<head>
+<meta charset="utf-8">
+<title>{{ .title }}</title>
+<body>
+	<h1>{{ .title }}</h1>
+	<hr /><br />
+
+    {{ range .data }} <p><a href="/blog/post/{{ .Id }}">{{ .Title }} </a> </p> {{ end }}
+
+    <p> <a href="/blog/add">Add Post</a></p>
+</html>

@@ -1,0 +1,52 @@
+{{define "Detail"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}}</title>
+    {{template "UIkit"}}
+</head>
+<body>
+    <a href="/" uk-icon="icon: home"></a><h1>{{.Post.Header}}!</h1>
+    <div class="uk-card uk-card-default uk-card-body">
+        <span>
+            {{.Post.Text}}
+            <div class="uk-align-right">
+                 <span class="uk-label">{{.Post.Date.Format "02.01.2006 15:04:05"}}</span>
+            </div>
+        </span>
+    </div>
+</body>
+</html>
+{{end}}
+
+{{define "Posts"}}
+<div class="uk-card uk-card-body">
+    <ul class="uk-list">
+        {{range $key, $val := .Posts}}
+        <a style="display:block" href="#">
+        <div class="uk-card uk-card-default uk-card-body">
+            <h3>{{.ID}}) {{.Header}}</h3>
+            <span>
+                {{.Text}}
+                <div class="uk-align-right">
+                     <span class="uk-label">{{.Date.Format "02.01.2006 15:04:05"}}</span>
+                </div>
+            </span>
+        </div>
+        </a>
+        {{end}}
+    </ul>
+</div>
+{{end}}
+
+
+{{define "UIkit"}}
+<!-- UIkit CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/css/uikit.min.css" />
+
+<!-- UIkit JS -->
+<script src="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/js/uikit.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/js/uikit-icons.min.js"></script>
+{{end}}

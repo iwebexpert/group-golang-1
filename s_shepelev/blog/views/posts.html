@@ -1,0 +1,15 @@
+{{define "body"}}
+<div class="uk-container">
+<div class="uk-flex">
+
+{{range  .}}
+<a href="/posts/{{.ID}}" class="uk-display-block uk-card uk-card-body uk-card-default uk-card-hover 
+    uk-height-max-medium uk-margin-top uk-margin-left uk-link-toggle uk-width-medium">
+    <div class="uk-card-badge uk-label">{{.Author}}</div> 
+    <h3 class="uk-card-title"><span class="uk-link-heading">{{.Title}}</span></h3>
+    <p>{{.Description}}</p>
+</a>
+{{end}}
+{{end}}
+</div>
+</div>

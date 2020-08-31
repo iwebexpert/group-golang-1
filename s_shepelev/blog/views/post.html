@@ -1,0 +1,77 @@
+{{define "body"}}
+<div class="uk-container">
+    <div class="uk-child-width-1-2@s" uk-grid>
+        <div>
+            <div class="uk-panel uk-panel-box uk-text-break">
+                <div class="uk-card uk-card-body uk-card-default uk-margin-top uk-margin-left">
+                    <div class="uk-card-badge uk-label">{{.Author}}</div>
+                    <h3>{{.Title}}</h3>
+                    <p>{{.Description}}</p>
+                </div>
+                <button class="uk-button uk-button-danger uk-margin uk-align-right" id="DeletePost">Delete Post</button>
+            </div>
+        </div>
+        <div>
+            <div class="uk-panel uk-panel-box uk-text-break uk-margin-top uk-margin-left">
+                <input class="uk-input" type="text" placeholder="Author" id="PostAuthor">
+                <input class="uk-input" type="text" placeholder="Title" id="PostTitle">
+                <textarea class="uk-textarea" rows="6" placeholder="Text" id="PostText"></textarea>
+                <button class="uk-button uk-button-primary uk-margin uk-align-right" id="SavePost">Save Post</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById("DeletePost").addEventListener("click", () => {
+        let url = document.URL
+
+        let req = fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        }).
+            then((response) => {
+                if (response.status === 200) {
+                    window.history.pushState({page: '/'}, null, '/');
+                    window.location.reload();
+                }
+            })
+    });
+
+    document.getElementById("SavePost").addEventListener("click", () => {
+        let url = document.URL
+        let title = document.getElementById("PostTitle").value;
+        let text = document.getElementById("PostText").value;
+        let author = document.getElementById("PostAuthor").value;
+
+        if (title === "" && text === "" && author === "") {
+            UIkit.notification({
+                message: 'Fields title and text are empty!',
+                status: 'danger',
+                pos: 'top-center'
+            });
+            return
+        }
+
+        let req = fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                'title': title,
+                'description': text,
+                'author': author,
+            })
+        }).
+            then((response) => {
+                if (response.status === 201) {
+                    window.history.pushState({page: '/'}, null, '/');
+                    window.location.reload();
+                }
+            })
+    });
+</script>
+{{end}}

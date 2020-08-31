@@ -1,0 +1,46 @@
+{{define "singlePost"}}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{{.BlogTitle}}</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- UIkit CSS -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/css/uikit.min.css" />
+
+        <!-- UIkit JS -->
+        <script src="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/js/uikit.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/js/uikit-icons.min.js"></script>
+    </head>
+    <body>
+        <nav class="uk-navbar-container uk-margin" uk-navbar>
+            <div class="uk-navbar-left">
+
+                <a class="uk-navbar-item uk-logo" href="/">{{.BlogTitle}}</a>
+
+                <ul class="uk-navbar-nav">
+                    <li>
+                        <a href="/posts/add">
+                            <button class="uk-button uk-button-primary">
+                                Добавить запись
+                                <span class="uk-icon uk-margin-small-left" uk-icon="icon: plus"></span>
+                            </button>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <div class="uk-container uk-margin-medium-top">
+            <h2 class="uk-card-title">
+                {{ .Post.Title }}
+            </h2>
+            <div>
+                {{ .Post.Text }}
+            </div>
+            <div class="uk-align-right">
+                <a href="/posts/{{ .Post.Id }}/edit">Редактировать</a>
+            </div>
+        </div>
+    </body>
+</html>
+{{end}}

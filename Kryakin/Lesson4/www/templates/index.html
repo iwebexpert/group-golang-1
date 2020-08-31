@@ -1,0 +1,131 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Posts!</title>
+    {{template "UIkit"}}
+    {{template "JS"}}
+</head>
+<body>
+    <div class="uk-card uk-card-default uk-card-body">
+        <h1>Posts!</h1><a href="/index.html" uk-icon="icon: home"></a>
+        <span>
+            {{template "Posts" .}}
+        </span>
+    </div>
+</body>
+</html>
+
+
+{{define "Posts"}}
+<div class="uk-card uk-card-body">
+    <ul class="uk-list">
+        {{range $key, $val := .Posts}}
+            <div class="uk-card uk-card-default uk-card-body" post-id="{{.ID}}">
+                <a href="?ID={{.ID}}">
+                    <h3>{{.ID}})</h3>
+                </a>
+                <input type="text" class="uk-input" value="{{.Header}}" name="Header">
+                    <input type="text" class="uk-input" value="{{.Text}}" name="Text">
+                    <div class="uk-align-right">
+                        <span class="uk-label">{{.Date}}</span>
+                    </div>
+                <div>
+                    <hr>
+                    <button class="uk-button uk-button-default" onclick="updatePost('{{.ID}}')">Сохранить</button>
+                    <button class="uk-button uk-button-default" onclick="delPost('{{.ID}}')">Удалить</button>
+                </div>
+
+            </div>
+
+        {{end}}
+    </ul>
+</div>
+<hr>
+{{template "NewPost"}}
+{{end}}
+
+
+{{define "NewPost"}}
+<div class="uk-card uk-card-body" >
+    <div class="uk-card uk-card-default uk-card-body" post-id="newPost">
+        <div>
+            <input class="uk-input" type="text" name="Header" placeholder="Post Header"/>
+            <input class="uk-input" type="text" name="Text" placeholder="Post text"/>
+            <button class="uk-button" uk-button-default onclick="createPost()">Сохранить</button>
+        </div>
+    </div>
+</div>
+{{end}}
+
+{{define "JS"}}
+<script>
+    async function createPost(){
+        console.log('createTask()');
+        let postForm = document.querySelector('div[post-id="newPost"]');
+        let postHeader = postForm.querySelector('input[name="Header"]').value;
+        let postText = postForm.querySelector('input[name="Text"]').value;
+        console.log(postHeader, postText);
+
+        let data = await fetch(`/api/v1/posts`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        Header: postHeader,
+                        Text: postText,
+                    }),
+                });
+
+                let dataPost = await data.json();
+                if(dataPost){
+                    console.log(dataPost);
+                    window.location.reload();
+                }
+ }
+
+async function updatePost(id){
+        console.log('updatePost()');
+
+        let postForm = document.querySelector(`div[post-id="${id}"]`)
+        let postHeader = postForm.querySelector('input[name="Header"]').value;
+        let postText = postForm.querySelector('input[name="Text"]').value;
+
+        let data = await fetch(`/api/v1/posts/${id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        ID: id,
+                        Header: postHeader,
+                        Text: postText,
+                    }),
+                });
+                console.log(id);
+                let dataPost = await data.json();
+                if(dataPost){
+                    console.log(dataPost);
+                    window.location.reload();
+                }
+    }
+function delPost(id){
+        console.log('deletePost()');
+
+        fetch(`/api/v1/posts/${id}`, {
+                    method: 'DELETE',
+                }).then(Response=> {
+                    console.log("Post deleted");
+                    window.location.reload();
+                });
+    }
+
+
+</script>
+{{end}}
+
+{{define "UIkit"}}
+<!-- UIkit CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/css/uikit.min.css" />
+
+<!-- UIkit JS -->
+<script src="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/js/uikit.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/js/uikit-icons.min.js"></script>
+{{end}}
