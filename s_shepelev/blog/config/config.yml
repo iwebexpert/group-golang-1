@@ -1,3 +1,3 @@
 listenAddr: localhost:8080
 
-database: toringol:1234@tcp(localhost:3306)/blog_app?parseTime=true
+database: mongodb://localhost:27017/

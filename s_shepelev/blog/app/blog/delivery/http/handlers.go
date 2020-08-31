@@ -2,8 +2,8 @@ package http
 
 import (
 	"html/template"
+	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/Toringol/group-golang-1/tree/master/s_shepelev/blog/app/blog"
 	"github.com/Toringol/group-golang-1/tree/master/s_shepelev/blog/app/model"
@@ -39,13 +39,11 @@ func (bh *blogHandlers) getAllPostsHandlers(ctx echo.Context) error {
 }
 
 func (bh *blogHandlers) getPostInfoHandler(ctx echo.Context) error {
-	postID, err := strconv.ParseInt(ctx.Param("postID"), 10, 64)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
-	}
+	postID := ctx.Param("postID")
 
 	post, err := bh.usecase.SelectPostByID(postID)
 	if err != nil {
+		log.Println(err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
 	}
 
@@ -53,20 +51,17 @@ func (bh *blogHandlers) getPostInfoHandler(ctx echo.Context) error {
 }
 
 func (bh *blogHandlers) changePostHandler(ctx echo.Context) error {
-	postID, err := strconv.ParseInt(ctx.Param("postID"), 10, 64)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
-	}
-
-	oldPostData, err := bh.usecase.SelectPostByID(postID)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
-	}
+	postID := ctx.Param("postID")
 
 	postData := new(model.Post)
 	postData.ID = postID
 
 	if err := ctx.Bind(postData); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
+	}
+
+	oldPostData, err := bh.usecase.SelectPostByID(postData.ID)
+	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
 	}
 
@@ -82,8 +77,9 @@ func (bh *blogHandlers) changePostHandler(ctx echo.Context) error {
 
 	postData.Description = template.HTML(blackfriday.Run([]byte(postData.Description)))
 
-	_, err = bh.usecase.UpdatePost(postData)
+	err = bh.usecase.UpdatePost(postData)
 	if err != nil {
+		log.Println(err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
 	}
 
@@ -91,12 +87,9 @@ func (bh *blogHandlers) changePostHandler(ctx echo.Context) error {
 }
 
 func (bh *blogHandlers) deletePostHandler(ctx echo.Context) error {
-	postID, err := strconv.ParseInt(ctx.Param("postID"), 10, 64)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
-	}
+	postID := ctx.Param("postID")
 
-	_, err = bh.usecase.DeletePost(postID)
+	err := bh.usecase.DeletePost(postID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
 	}
@@ -117,7 +110,7 @@ func (bh *blogHandlers) createNewPostHandler(ctx echo.Context) error {
 
 	postData.Description = template.HTML(blackfriday.Run([]byte(postData.Description)))
 
-	_, err := bh.usecase.CreatePost(postData)
+	err := bh.usecase.CreatePost(postData)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
 	}
