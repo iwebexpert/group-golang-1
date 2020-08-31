@@ -34,7 +34,7 @@ func (srv *Server) GetPage(w http.ResponseWriter, r *http.Request) {
 	}
 	NewPosts, err := models.Get(srv.Ctx, srv.DBMongo)
 	if err != nil {
-		fmt.Println(err)
+		srv.lg.WithError(err).Fatal("NewPost err")
 		return
 	}
 	srv.Posts = *NewPosts
@@ -49,7 +49,7 @@ func (srv *Server) PostCreate(w http.ResponseWriter, r *http.Request) {
 
 	id, err := srv.Posts.NewPost(srv.Ctx, srv.DBMongo, post.Header, post.Text)
 	if err != nil {
-		fmt.Println(err)
+		srv.lg.WithError(err).Fatal("NewPost err")
 		return
 	}
 	data, _ = json.Marshal(srv.Posts[id])
@@ -61,13 +61,13 @@ func (srv *Server) PostGet(w http.ResponseWriter, r *http.Request) {
 	postID := chi.URLParam(r, "postID")
 	post, ok := srv.Posts[postID]
 	if !ok {
-		fmt.Println("no such ID=", postID)
+		srv.lg.Warningln("no such ID=", postID)
 		return
 	}
 
 	data, err := json.Marshal(post)
 	if err != nil {
-		fmt.Println(err)
+		srv.lg.WithError(err).Fatal("PostGet Marshal err")
 		return
 	}
 
@@ -77,10 +77,10 @@ func (srv *Server) PostGet(w http.ResponseWriter, r *http.Request) {
 //PostDelete -
 func (srv *Server) PostDelete(w http.ResponseWriter, r *http.Request) {
 	postID := chi.URLParam(r, "postID")
-	fmt.Println("Del", postID)
+	srv.lg.Debug("Del", postID)
 	post, ok := srv.Posts[postID]
 	if !ok {
-		fmt.Print("no such ID=", postID)
+		srv.lg.Warningln("no such ID=", postID)
 		return
 	}
 
@@ -96,10 +96,10 @@ func (srv *Server) PostDelete(w http.ResponseWriter, r *http.Request) {
 
 func (srv *Server) PostUpdate(w http.ResponseWriter, r *http.Request) {
 	postID := chi.URLParam(r, "postID")
-	fmt.Print("upd ID=", postID, "\r\n")
+	srv.lg.Debug("upd ID=", postID)
 	_, ok := srv.Posts[postID]
 	if !ok {
-		fmt.Print("no such ID=", postID)
+		srv.lg.Warningln("no such ID=", postID)
 		return
 	}
 	data, _ := ioutil.ReadAll(r.Body)
@@ -108,7 +108,7 @@ func (srv *Server) PostUpdate(w http.ResponseWriter, r *http.Request) {
 
 	err := srv.Posts.UpdatePost(srv.Ctx, srv.DBMongo, postID, post.Header, post.Text)
 	if err != nil {
-		fmt.Println(err)
+		srv.lg.WithError(err).Fatal("UpdatePost err")
 		return
 	}
 

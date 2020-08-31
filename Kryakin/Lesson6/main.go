@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"lesson6/server"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -10,20 +9,23 @@ import (
 )
 
 func main() {
+	lg := NewLogger()
+
 	ctx := context.Background()
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://root:1234@localhost:27017"))
 	if err != nil {
-		fmt.Println(err)
+		lg.WithError(err).Fatal("Не удалось соединиться с БД")
 		return
 	}
 
 	defer client.Disconnect(ctx)
 	db := client.Database("posts")
-	srv, err := server.New(ctx, db)
+	srv, err := server.New(lg, ctx, db)
 	if err != nil {
-		fmt.Println("Server start error", err)
+		lg.WithError(err).Fatal("Server start err.")
 		return
 	}
+	lg.Debug("Server is started ...")
 
 	srv.Serve(":8080")
 }

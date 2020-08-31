@@ -2,17 +2,18 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"lesson6/models"
 	"net/http"
 	"os"
 	"os/signal"
 
 	"github.com/go-chi/chi"
+	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type Server struct {
+	lg      *logrus.Logger
 	Title   string
 	Posts   models.Posts
 	DBMongo *mongo.Database
@@ -20,13 +21,15 @@ type Server struct {
 	router  *chi.Mux
 }
 
-func New(ctx context.Context, mongodb *mongo.Database) (*Server, error) {
+func New(lg *logrus.Logger, ctx context.Context, mongodb *mongo.Database) (*Server, error) {
 	posts, err := models.Get(ctx, mongodb)
 	if err != nil {
+		lg.WithError(err).Fatal("Models get err")
 		return nil, err
 	}
 
 	srv := &Server{
+		lg:      lg,
 		DBMongo: mongodb,
 		Posts:   *posts,
 		router:  chi.NewRouter(),
@@ -41,12 +44,12 @@ func (srv *Server) Serve(port string) {
 	signal.Notify(stopChannel, os.Kill, os.Interrupt)
 
 	go func() {
-		fmt.Println("Server start")
+
 		for {
 			err := http.ListenAndServe(port, srv.router)
-			fmt.Println(err)
+			srv.lg.WithError(err).Fatal("Serve err")
 		}
 	}()
 	<-stopChannel
-	fmt.Println("Server stop")
+	srv.lg.Warnln("Server stoped")
 }
