@@ -1,0 +1,119 @@
+{{define "posts"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{.Title}}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {{template "UIkit"}}
+    {{template "JS"}}
+</head>
+<body>
+    <h1>HelloMongo!</h1>
+    <div class="uk-card uk-card-default uk-card-body">    
+    {{template "PostsW" .}}
+    <hr>
+    <h2>Новая запись</h2>
+    {{template "NewPost"}}
+    </div>
+</body>
+</html>
+{{end}}
+
+{{define "PostsW"}}
+<div class="uk-card uk-card-body">
+    {{range $key, $val := .Posts}}
+        <div class="uk-card uk-card-default uk-card-body" post-id="{{.ID.Hex}}">
+            <div>
+                {{.ID.Hex}}
+                <button class="uk-button uk-button-default" onclick="updateTask('{{.ID.Hex}}')">Сохранить</button>
+                <button class="uk-button uk-button-default" onclick="deleteTask('{{.ID.Hex}}')">Удалить</button>
+            </div>
+            <span class="uk-label">{{.Date}}</span>
+            <input type="text" class="uk-input" name="Header" value="{{.Header}}"/>
+            <input type="text" class="uk-input" name="Text" value="{{.Text}}"/>
+        </div>
+    {{end}}
+</div>
+{{end}}   
+
+{{define "NewPost"}}
+<div class="uk-card uk-card-body">
+    <div class="uk-card uk-card-default uk-card-body" post-id="new">
+        <div>
+            <button class="uk-button uk-button-default" onclick="createTask()">Сохранить</button>
+        </div>
+        <input type="text" class="uk-input" name="NewHeader">
+        <input type="text" class="uk-input" name="NewText">
+    </div>
+</div>
+{{end}}
+
+{{define "UIkit"}}
+<!-- UIkit CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/css/uikit.min.css" />
+
+<!-- UIkit JS -->
+<script src="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/js/uikit.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/js/uikit-icons.min.js"></script>
+{{end}}
+
+{{define "JS"}}
+<script>
+    async function createTask(){
+        console.log('createTask()');
+        let taskForm = document.querySelector('div[post-id="new"]');
+        let postHeader = taskForm.querySelector('input[name="NewHeader"]').value;
+        let postText = taskForm.querySelector('input[name="NewText"]').value;
+        console.log(postHeader, postText);
+        console.log(JSON.stringify({about: postHeader,text: postText}));
+
+        let data = await fetch('/api/v1/posts/', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        header: postHeader,
+                        text: postText                        
+                    }),
+                });
+        console.log(data);
+
+                let dataTask = await data.json();
+                if(dataTask){
+                    console.log(dataTask);
+                    window.location.reload();
+                }
+    }
+
+    async function updateTask(id){
+        console.log('updateTask()');
+        let taskForm = document.querySelector(`div[post-id="${id}"]`);
+        let postHeader = taskForm.querySelector('input[name="Header"]').value;
+        let postText = taskForm.querySelector('input[name="Text"]').value;
+
+        let data = await fetch(`/api/v1/posts/${id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        header: postHeader,
+                        text: postText 
+                    }),
+                });
+
+        let dataTask = await data.json();
+                if(dataTask){
+                    console.log(dataTask);
+                    window.location.reload();
+                }
+    }
+
+    function deleteTask(id){
+        console.log('deleteTask()');
+
+        fetch(`/api/v1/posts/${id}`, {
+                    method: 'DELETE',
+                }).then(response => {
+                    window.location.reload();
+                });
+    }
+
+</script>
+{{end}} 
