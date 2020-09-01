@@ -21,21 +21,21 @@ func (bu blogUsecase) ListPosts() ([]*model.Post, error) {
 }
 
 // SelectPostByID - return post by id
-func (bu blogUsecase) SelectPostByID(id int64) (*model.Post, error) {
+func (bu blogUsecase) SelectPostByID(id string) (*model.Post, error) {
 	return bu.repo.SelectPostByID(id)
 }
 
 // CreatePost - create new record in DB posts
-func (bu blogUsecase) CreatePost(post *model.Post) (int64, error) {
+func (bu blogUsecase) CreatePost(post *model.Post) error {
 	return bu.repo.CreatePost(post)
 }
 
 // UpdatePost - update post`s data in DataBase
-func (bu blogUsecase) UpdatePost(post *model.Post) (int64, error) {
+func (bu blogUsecase) UpdatePost(post *model.Post) error {
 	return bu.repo.UpdatePost(post)
 }
 
 // DeletePost - delete post`s record in DataBase
-func (bu blogUsecase) DeletePost(id int64) (int64, error) {
+func (bu blogUsecase) DeletePost(id string) error {
 	return bu.repo.DeletePost(id)
 }
