@@ -2,41 +2,44 @@ package server
 
 import (
 	"blog/models"
+	"context"
 	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
 
 	"github.com/go-chi/chi"
-	"github.com/jinzhu/gorm"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 //BlogServer -
 type BlogServer struct {
-	Title     string
-	Posts     models.BlogPostArray
-	DBlinkORM *gorm.DB
-	router    *chi.Mux
+	Title   string
+	Posts   models.BlogPostArray
+	DBMongo *mongo.Database
+	Ctx     context.Context
+	router  *chi.Mux
 }
 
-//New --
-func New(title string, gormdb *gorm.DB) (*BlogServer, error) {
-	posts, err := models.Retrieve(gormdb)
+//New -- Создание нового экземпляра сервера (требуется активное подключение к БД)
+func New(ctx context.Context, mongodb *mongo.Database, title string) (*BlogServer, error) {
+	posts, err := models.Retrieve(ctx, mongodb)
 	if err != nil {
 		return nil, err
 	}
 
 	srv := &BlogServer{
-		Title:     title,
-		DBlinkORM: gormdb,
-		Posts:     *posts,
-		router:    chi.NewRouter(),
+		Title:   title,
+		DBMongo: mongodb,
+		Posts:   *posts,
+		router:  chi.NewRouter(),
+		Ctx:     ctx,
 	}
 	srv.defineRoutes()
 	return srv, nil
 }
 
-//Serve --
+//Serve -- Сервер работать
 func (srv *BlogServer) Serve(port string) {
 	stopChannel := make(chan os.Signal)
 	signal.Notify(stopChannel, os.Kill, os.Interrupt)
