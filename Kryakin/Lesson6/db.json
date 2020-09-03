@@ -1,0 +1,22 @@
+[{
+  "_id": {
+    "$oid": "5f4d0f97a1aaa1787c52018f"
+  },
+  "Header": "New header",
+  "Text": "Hello Mongo!",
+  "Date": "2020-08-31 17:56:23"
+},{
+  "_id": {
+    "$oid": "5f4d0fb3c728473c09872a3b"
+  },
+  "Header": "Another header",
+  "Text": "Hello again, Mongo!",
+  "Date": "2020-08-31 20:05:56"
+},{
+  "_id": {
+    "$oid": "5f4d3350379b46eea2269be4"
+  },
+  "Header": "TestingLogger",
+  "Text": "LoggingToster",
+  "Date": "2020-08-31 20:28:48"
+}]

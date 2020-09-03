@@ -1,0 +1,79 @@
+{{define "managerList"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}}</title>
+    {{template "UIkit"}}
+    {{template  "JS"}}
+</head>
+<body>
+    <h1>{{.Title}}!</h1>
+    <div class="uk-card uk-card-default uk-card-body">
+        <progress class="uk-progress" value="{{.Tasks.TaskWithStatus true}}" max="{{len .Tasks}}"></progress>
+        <span>Всего задач: {{len .Tasks}}, выполнено {{.Tasks.TaskWithStatus true}} ({{.Tasks.CompletedTasksPercent}}%)</span>
+        {{template "Tasks" .}}
+    </div>
+</body>
+</html>
+{{end}}
+
+{{define "Tasks"}}
+<div class="uk-card uk-card-body">
+    <ul class="uk-list">
+        {{range $key, $val := .Tasks}}
+        <li>
+            <div class="uk-card uk-card-default uk-card-body">
+                {{if .Completed}}
+                <input data-task-id="{{$key}}" class="checkbox uk-checkbox" type="checkbox" checked >
+                {{else}}
+                <input data-task-id="{{$key}}" class="checkbox uk-checkbox" type="checkbox">
+                {{end}}
+
+                <span>{{.Text}}</span>
+                <div class="uk-align-right">
+                    {{range .Labels}}
+                    <span class="uk-label">{{.}}</span>
+                    {{end}}
+                </div>
+
+            </div>
+        </li>
+        {{end}}
+    </ul>
+ </div>
+{{end}}
+
+{{define "UIkit"}}
+<!-- UIkit CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/css/uikit.min.css" />
+
+<!-- UIkit JS -->
+<script src="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/js/uikit.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/js/uikit-icons.min.js"></script>
+{{end}}
+
+{{define "JS"}}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let checkboxAll = document.querySelectorAll('input');
+            for(let item of checkboxAll){
+                item.addEventListener('click', async (event) => {
+                    let taskId = event.target.dataset.taskId;
+                    let taskCmpleted = event.target.checked;
+
+                    let data = await fetch(`/${taskId}/${taskCmpleted}`, {
+                        method: 'POST',
+                    });
+
+                    let dataTask = await data.json();
+                    if(dataTask){
+                       // console.log(dataTask);
+                        window.location.reload();
+                    }
+                });
+            }
+        });
+    </script>
+{{end}}

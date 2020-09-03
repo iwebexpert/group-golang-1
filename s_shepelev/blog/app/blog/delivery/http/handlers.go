@@ -1,26 +1,14 @@
 package http
 
 import (
-	"encoding/json"
 	"html/template"
-	"io/ioutil"
+	"log"
 	"net/http"
-	"path"
-	"strconv"
 
 	"github.com/Toringol/group-golang-1/tree/master/s_shepelev/blog/app/blog"
 	"github.com/Toringol/group-golang-1/tree/master/s_shepelev/blog/app/model"
-	"github.com/go-chi/chi"
+	"github.com/labstack/echo/v4"
 	"github.com/russross/blackfriday"
-)
-
-var (
-	layoutTemplatePosts = template.Must(template.ParseFiles(path.Join("../templates", "layout.html"),
-		path.Join("../templates", "posts.html")))
-	layoutTemplateActualPost = template.Must(template.ParseFiles(path.Join("../templates", "layout.html"),
-		path.Join("../templates", "post.html")))
-	layoutTemplateAddPost = template.Must(template.ParseFiles(path.Join("../templates", "layout.html"),
-		path.Join("../templates", "newpost.html")))
 )
 
 // blogHandlers - http handlers structure
@@ -29,75 +17,52 @@ type blogHandlers struct {
 }
 
 // NewBlogHandler - deliver our handlers in http
-func NewBlogHandler(router *chi.Mux, us blog.Usecase) {
+func NewBlogHandler(e *echo.Echo, us blog.Usecase) {
 	handlers := blogHandlers{usecase: us}
 
 	// Blog handlers
-	router.Get("/", handlers.getAllPostsHandlers)
-	router.Get("/posts/{postID}", handlers.getPostInfoHandler)
-	router.Post("/posts/{postID}", handlers.changePostHandler)
-	router.Get("/addPost", handlers.getNewPostHandler)
-	router.Post("/addPost", handlers.createNewPostHandler)
+	e.GET("/", handlers.getAllPostsHandlers)
+	e.GET("/posts/:postID", handlers.getPostInfoHandler)
+	e.PUT("/posts/:postID", handlers.changePostHandler)
+	e.DELETE("/posts/:postID", handlers.deletePostHandler)
+	e.GET("/addPost", handlers.getNewPostHandler)
+	e.POST("/addPost", handlers.createNewPostHandler)
 }
 
-func (bh *blogHandlers) getAllPostsHandlers(w http.ResponseWriter, r *http.Request) {
+func (bh *blogHandlers) getAllPostsHandlers(ctx echo.Context) error {
 	posts, err := bh.usecase.ListPosts()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
 	}
 
-	if err := layoutTemplatePosts.ExecuteTemplate(w, "layout", posts); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	return ctx.Render(http.StatusOK, "posts", posts)
 }
 
-func (bh *blogHandlers) getPostInfoHandler(w http.ResponseWriter, r *http.Request) {
-	postID, err := strconv.ParseInt(chi.URLParam(r, "postID"), 10, 64)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+func (bh *blogHandlers) getPostInfoHandler(ctx echo.Context) error {
+	postID := ctx.Param("postID")
 
 	post, err := bh.usecase.SelectPostByID(postID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		log.Println(err)
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
 	}
 
-	if err := layoutTemplateActualPost.ExecuteTemplate(w, "layout", post); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	return ctx.Render(http.StatusOK, "post", post)
 }
 
-func (bh *blogHandlers) changePostHandler(w http.ResponseWriter, r *http.Request) {
-	postID, err := strconv.ParseInt(chi.URLParam(r, "postID"), 10, 64)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	oldPostData, err := bh.usecase.SelectPostByID(postID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	body, err := ioutil.ReadAll(r.Body)
-	defer r.Body.Close()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+func (bh *blogHandlers) changePostHandler(ctx echo.Context) error {
+	postID := ctx.Param("postID")
 
 	postData := new(model.Post)
 	postData.ID = postID
 
-	if err := json.Unmarshal(body, postData); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	if err := ctx.Bind(postData); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
+	}
+
+	oldPostData, err := bh.usecase.SelectPostByID(postData.ID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
 	}
 
 	if postData.Author == "" {
@@ -112,44 +77,43 @@ func (bh *blogHandlers) changePostHandler(w http.ResponseWriter, r *http.Request
 
 	postData.Description = template.HTML(blackfriday.Run([]byte(postData.Description)))
 
-	_, err = bh.usecase.UpdatePost(postData)
+	err = bh.usecase.UpdatePost(postData)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		log.Println(err)
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	return ctx.JSON(http.StatusCreated, nil)
 }
 
-func (bh *blogHandlers) getNewPostHandler(w http.ResponseWriter, r *http.Request) {
-	if err := layoutTemplateAddPost.ExecuteTemplate(w, "layout", ""); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+func (bh *blogHandlers) deletePostHandler(ctx echo.Context) error {
+	postID := ctx.Param("postID")
+
+	err := bh.usecase.DeletePost(postID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
 	}
+
+	return ctx.JSON(http.StatusOK, nil)
 }
 
-func (bh *blogHandlers) createNewPostHandler(w http.ResponseWriter, r *http.Request) {
-	body, err := ioutil.ReadAll(r.Body)
-	defer r.Body.Close()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+func (bh *blogHandlers) getNewPostHandler(ctx echo.Context) error {
+	return ctx.Render(http.StatusOK, "newPost", nil)
+}
 
+func (bh *blogHandlers) createNewPostHandler(ctx echo.Context) error {
 	postData := new(model.Post)
 
-	if err := json.Unmarshal(body, postData); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	if err := ctx.Bind(postData); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
 	}
 
 	postData.Description = template.HTML(blackfriday.Run([]byte(postData.Description)))
 
-	_, err = bh.usecase.CreatePost(postData)
+	err := bh.usecase.CreatePost(postData)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return echo.NewHTTPError(http.StatusInternalServerError, "Internal DB Error")
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	return ctx.JSON(http.StatusCreated, nil)
 }
