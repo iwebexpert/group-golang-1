@@ -1,0 +1,7 @@
+listenPort: 8080
+
+user: blogdb_adm
+password: sys
+host: 193.168.0.99
+port: 5432
+database: blogdb
