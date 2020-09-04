@@ -14,11 +14,11 @@
         <div class="uk-card uk-card-body">
             <ul class="uk-list">
                 {{range .Posts}}
-                <a style="display:block" href="/post?id={{.ID}}">
+                <a style="display:block" href="/post/{{.Id}}">
                 <div class="uk-card uk-card-default uk-card-body">
-                    <h3>{{.Posts.ID}}) {{.Posts.Header}}</h3>
+                    <h3>{{.Id}}. {{.Header}}</h3>
                     <span>
-                        {{.Posts.Text}}
+                        {{.Text}}
                     </span>
                 </div>
                 </a>
