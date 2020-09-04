@@ -10,7 +10,7 @@ import (
 
 func main() {
 	orm.RegisterDriver("mysql", orm.DRMySQL)
-	orm.RegisterDataBase("default", "mysql", "root:1@tcp(192.168.0.145)/my_blog")
+	orm.RegisterDataBase("default", "mysql", "root:1@tcp(192.168.1.8)/my_blog")
 
 	beego.Run()
 }

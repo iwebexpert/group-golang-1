@@ -1,8 +1,13 @@
+DROP DATABASE IF EXISTS my_blog;
+CREATE DATABASE my_blog;
+
+USE my_blog
+
 DROP TABLE IF EXISTS posts;
 CREATE TABLE posts (
-  ID int unsigned NOT NULL AUTO_INCREMENT,
-  Header varchar(255),
-  Text text,
+  id int unsigned NOT NULL AUTO_INCREMENT,
+  header varchar(255),
+  text text,
 UNIQUE KEY `id` (`id`));
 
 INSERT INTO posts VALUES

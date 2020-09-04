@@ -8,7 +8,7 @@ import (
 
 // Posts - структура связанная с таблицей в БД
 type Posts struct {
-	ID     uint64
+	Id     uint64
 	Header string
 	Text   string
 }
@@ -18,13 +18,12 @@ func (p *Posts) TableName() string {
 	return "posts"
 }
 
-// NewPost - создание нового поста
-func NewPost(text string) (*Posts, error) {
-	if text == "" {
-		return nil, fmt.Errorf("Empty post title")
+// NewUpdPost - создание нового или редактирование существующего поста
+func NewUpdPost(header, text string, id uint64) (*Posts, error) {
+	if header == "" {
+		return nil, fmt.Errorf("Empty post header")
 	}
-
-	return &Posts{Text: text}, nil
+	return &Posts{Id: id, Text: text, Header: header}, nil
 }
 
 func init() {
