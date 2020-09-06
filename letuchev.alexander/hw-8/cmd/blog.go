@@ -12,8 +12,7 @@ import (
 
 func main() {
 	if err := config.Parse(); err != nil {
-		fmt.Println("Ошибка чтения файла конфигурации", err)
-		return
+		panic(fmt.Sprintf("Ошибка чтения файла конфигурации %s", err))
 	}
 
 	db, err := sql.Open("pgx", fmt.Sprintf("user=%s password=%s host=%s port=%s database=%s",

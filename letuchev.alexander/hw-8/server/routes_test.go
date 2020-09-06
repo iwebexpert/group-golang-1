@@ -13,7 +13,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-//Пришлось templates скопировать в папку server, чтобы ее было видно во время выполнения теста
 func TestGetPage(t *testing.T) {
 	testCases := []string{
 		"index",
