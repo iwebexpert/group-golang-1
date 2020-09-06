@@ -1,0 +1,17 @@
+server: #Параметры HTTP-сервера
+  listen_port: 8080
+
+database: #Параметры соединения с PostgreSQL базой данных
+  user: blogdb_adm
+  password: sys
+  host: 193.168.0.99
+  port: 5432
+  database: blogdb
+
+log: #Параметры логирования
+  file_enable: true
+  syslog_enable: true #не поддерживается в Windows
+  stdout_enable: true
+  level: Debug
+  filepath: ..\log\
+    
