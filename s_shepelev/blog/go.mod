@@ -7,6 +7,7 @@ require (
 	github.com/Toringol/nonlinearity v0.0.0-20200419161811-7b797b1c65bf
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-sql-driver/mysql v1.5.0
+	github.com/golang/mock v1.3.1
 	github.com/gomarkdown/markdown v0.0.0-20200824053859-8c8b3816f167
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/echo/v4 v4.1.16
@@ -14,6 +15,7 @@ require (
 	github.com/satori/go.uuid v1.2.0
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/spf13/viper v1.7.1
+	github.com/stretchr/testify v1.4.0
 	go.mongodb.org/mongo-driver v1.4.0
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22
 )
