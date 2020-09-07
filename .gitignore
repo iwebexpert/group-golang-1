@@ -17,4 +17,6 @@
 # IDE
 .idea/
 .DS_Store
-ClassCodes
+
+#logs
+*.log
