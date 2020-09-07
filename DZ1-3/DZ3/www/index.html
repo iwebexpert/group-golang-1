@@ -1,0 +1,48 @@
+{{define "PostList"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}}</title>
+    {{template "UIkit"}}
+</head>
+<body>
+    <h1>{{.Title}}!</h1>    
+    <div class="uk-card uk-card-default uk-card-body">
+        <span>Новых сообщений: {{len .Post}}</span>
+
+        {{template "Post" .}}
+
+    </div>
+</body>
+</html>
+{{end}}
+
+{{define "Post"}}
+<div class="uk-card uk-card-body">
+    <ul class="uk-list">
+        {{range $key, $val := .Post}}
+        <a style="display:block" href="detail/?ID={{.ID}}">
+        <div class="uk-card uk-card-default uk-card-body">
+            <h3>{{.ID}}) {{.Name}}</h3>
+            <span>
+                {{.Text}}                
+            </span>
+        </div>
+        </a>
+        {{end}}
+    </ul>
+</div>
+<a href="/post" class="uk-button uk-button-default">NEW Post</a>
+{{end}}
+
+
+{{define "UIkit"}}
+<!-- UIkit CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/css/uikit.min.css" />
+
+<!-- UIkit JS -->
+<script src="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/js/uikit.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/js/uikit-icons.min.js"></script>
+{{end}}
