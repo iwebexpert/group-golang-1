@@ -50,6 +50,7 @@ func GetAllList() ([]TaskList, error)  {
 	if err != nil {
 		return res, err
 	}
+defer rows.Close()
 
 	for rows.Next() {
 		list := TaskList{}
@@ -74,16 +75,29 @@ func GetList(id string) (TaskList, error) {
 			return list, err
 	}
 
-	rows := database.Query(fmt.Sprintf("select * from task_list_app.tasks where tasks.list_id = %v", id))
+	rows, err := database.Query(fmt.Sprintf("select * from task_list_app.tasks where tasks.list_id = %v", id))
 	if err != nil {
 		return list, err
 	}
 	defer rows.Close()
+
+	for rows.Next() {
+		task := Task{}
+
+		err := rows.Scan(&task.ID, new(int), &task.Text, &task.Complete)
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+
+		list.List = append(list.List, task)
+	}
+	return list,nil
 }
 
 func main() {
 	//подключение к БД
-	db, err := sql.Open("mysql", "root:ваш_пароль_к_БД@/task_list_app")
+	db, err := sql.Open("mysql", "root:1234/task_list_app")
 	if err != nil {
 		log.Fatal(err)
 	}
