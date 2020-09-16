@@ -110,7 +110,7 @@ func viewLists(w http.ResponseWriter, r *http.Request){
 
 func main() {
 	//подключение к БД
-	db, err := sql.Open("mysql", "root:1234@/task_list_app")
+	db, err := sql.Open("mysql", "root:ваш_пароль_к_БД@/task_list_app")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -120,7 +120,7 @@ func main() {
 
 	router := http.NewServeMux()
 	router.HandleFunc("/", viewList)
-	router.HandleFunc("/", viewLists)
+	//router.HandleFunc("/", viewLists) //TODO: прописать правильно роут
 	log.Fatal(http.ListenAndServe(":8080", router))
 
 }
