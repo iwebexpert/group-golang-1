@@ -35,7 +35,15 @@ var simpleList = TaskList{
 	},
 }
 
+// обработчик роута для конкретного листа
 func viewList(w http.ResponseWriter, r *http.Request) {
+	list, err := GetList(r.URL.Query().Get("id"))
+	if err != nil {
+		log.Fatal(err)
+		w.WriteHeader(404)
+		return
+	}
+
 	if err := tmpl.ExecuteTemplate(w, "list", simpleList); err != nil {
 		log.Println(err)
 	}
@@ -93,6 +101,20 @@ func GetList(id string) (TaskList, error) {
 		list.List = append(list.List, task)
 	}
 	return list,nil
+}
+
+// роут для показа всех списков задач
+func viewLists(w http.ResponseWriter, r *http.Request){
+	lists, err := GetAllList()
+	if err != nil {
+		log.Fatal(err)
+		w.WriteHeader(500)
+		return
+	}
+
+	if err := tmpl.ExecuteTemplate(w, "alllists", lists); err != nil {
+		log.Println(err)
+	}
 }
 
 func main() {
