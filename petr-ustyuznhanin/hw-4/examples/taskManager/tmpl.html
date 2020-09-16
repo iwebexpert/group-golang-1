@@ -58,6 +58,36 @@
     </header>
 {{end}}
 
+{{define "alllists"}}
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Все списки</title>
+        {{template "head"}}
+    </head>
+    <body>
+    {{template "header"}}
+
+    <div class="uk-container">
+        <h3 class="uk-heading-divider">Все списки</h3>
+
+        <div class="uk-child-width-1-3@m uk-grid-small uk-grid-match" uk-grid>
+            {{range .}}
+                <a href="/list?id={{.ID}}">
+                    <div class="uk-card uk-card-hover uk-card-body">
+                        <h3 class="uk-card-title">{{.Name}}</h3>
+                        <p>{{.Description}}</p>
+                    </div>
+                </a>
+            {{end}}
+        </div>
+    </div>
+
+    {{template "footer"}}
+    </body>
+    </html>
+{{end}}
+
 {{define "footer"}}
     <footer>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.1.5/css/uikit.min.css" />
