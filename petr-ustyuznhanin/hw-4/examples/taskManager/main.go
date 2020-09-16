@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	_ "github.com/go-sql-driver/mysql"
 	"html/template"
 	"log"
 	"net/http"
@@ -25,16 +26,6 @@ type Task struct {
 
 var tmpl = template.Must(template.New("MyTemplate").ParseFiles("tmpl.html"))
 
-var simpleList = TaskList{
-	Name: "Название листа",
-	Description: "Описание листа с задачами",
-	List: []Task{
-		{"first", "Первая задача", false},
-		{"second", "Вторая задача", false},
-		{"thrid", "Третья задача", true},
-	},
-}
-
 // обработчик роута для конкретного листа
 func viewList(w http.ResponseWriter, r *http.Request) {
 	list, err := GetList(r.URL.Query().Get("id"))
@@ -44,7 +35,7 @@ func viewList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := tmpl.ExecuteTemplate(w, "list", simpleList); err != nil {
+	if err := tmpl.ExecuteTemplate(w, "list", list); err != nil {
 		log.Println(err)
 	}
 }
@@ -58,7 +49,7 @@ func GetAllList() ([]TaskList, error)  {
 	if err != nil {
 		return res, err
 	}
-defer rows.Close()
+	defer rows.Close()
 
 	for rows.Next() {
 		list := TaskList{}
@@ -119,7 +110,7 @@ func viewLists(w http.ResponseWriter, r *http.Request){
 
 func main() {
 	//подключение к БД
-	db, err := sql.Open("mysql", "root:1234/task_list_app")
+	db, err := sql.Open("mysql", "root:1234@/task_list_app")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -129,6 +120,7 @@ func main() {
 
 	router := http.NewServeMux()
 	router.HandleFunc("/", viewList)
+	router.HandleFunc("/", viewLists)
 	log.Fatal(http.ListenAndServe(":8080", router))
 
 }
