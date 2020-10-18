@@ -33,7 +33,7 @@ func (serv *Server) getTemplateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	temp, err := template.New("Page").Parse(string(data))
+	templ, err := template.New("Page").Parse(string(data))
 	if err != nil {
 		serv.SendInternalErr(w, err)
 		return

@@ -2,7 +2,11 @@ package main
 
 import (
 	"database/sql"
+	"os"
+	"os/signal"
 	"server/server"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func main() {
@@ -23,4 +27,7 @@ func main() {
 		}
 	}()
 
+	stopSignal := make(chan os.Signal)
+	signal.Notify(stopSignal, os.Interrupt, os.Kill)
+	<-stopSignal // ожидаем
 }
