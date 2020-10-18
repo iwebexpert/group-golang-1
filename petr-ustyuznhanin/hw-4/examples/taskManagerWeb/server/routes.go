@@ -6,6 +6,6 @@ import (
 
 func (server *Server) bindRoutes(r *chi.Mux) {
 	r.Route("/", func(r chi.Router) {
-		r.Get("{/template}", server.getTemplateHandler)
+		r.Get("/{template}", server.getTemplateHandler)
 	})
 }
