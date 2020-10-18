@@ -20,7 +20,12 @@ type Server struct {
 
 func New(lg *logrus.Logger, rootDir string, db *sql.DB) *Server {
 	return &Server{
-
+		lg,
+		db,
+		rootDir,
+		templatesDir,
+		indexTemplate,
+		Page,
 	}
 }
 
