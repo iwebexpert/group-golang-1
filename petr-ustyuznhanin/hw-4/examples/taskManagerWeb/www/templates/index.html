@@ -1,23 +1,18 @@
-{{define "managerList"}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{.Title}}</title>
     {{template "UIkit"}}
     {{template  "JS"}}
 </head>
 <body>
-    <h1>{{.Title}}!</h1>
+    <h1>TODOLIST</h1>
     <div class="uk-card uk-card-default uk-card-body">
-        <progress class="uk-progress" value="{{.Tasks.TaskWithStatus true}}" max="{{len .Tasks}}"></progress>
-        <span>Всего задач: {{len .Tasks}}, выполнено {{.Tasks.TaskWithStatus true}} ({{.Tasks.CompletedTasksPercent}}%)</span>
-        {{template "Tasks" .}}
+        {{template "Tasks" .}}     
     </div>
 </body>
 </html>
-{{end}}
 
 {{define "Tasks"}}
 <div class="uk-card uk-card-body">
