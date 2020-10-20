@@ -1,17 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {{template "UIkit"}}
     {{template  "JS"}}
+    <title>Document</title>
 </head>
+
 <body>
     <h1>TODOLIST</h1>
     <div class="uk-card uk-card-default uk-card-body">
-        {{template "Tasks" .}}     
+        {{template "Tasks" .}}
+        <hr>
+        {{template "NewTask" .}}
     </div>
 </body>
+
 </html>
 
 {{define "Tasks"}}
@@ -21,23 +27,26 @@
         <li>
             <div class="uk-card uk-card-default uk-card-body">
                 {{if .Completed}}
-                <input data-task-id="{{$key}}" class="checkbox uk-checkbox" type="checkbox" checked >
+                <input data-task-id="{{$key}}" class="checkbox uk-checkbox" type="checkbox" checked>
                 {{else}}
                 <input data-task-id="{{$key}}" class="checkbox uk-checkbox" type="checkbox">
                 {{end}}
-
                 <span>{{.Text}}</span>
-                <div class="uk-align-right">
-                    {{range .Labels}}
-                    <span class="uk-label">{{.}}</span>
-                    {{end}}
-                </div>
-
             </div>
         </li>
         {{end}}
     </ul>
- </div>
+</div>
+{{end}}
+
+{{define "NewTask"}}
+<div class="uk-card uk-card-body">
+    <div class="uk-card-body uk-card-default uk-card" task-id="new">
+        <input type="checkbox" class="uk-checkbox">
+        <button class="uk-button uk-button-default" onclick="createTask()">Сохранить</button>
+    </div>
+    <input type="text" class="uk-input">
+</div>
 {{end}}
 
 {{define "UIkit"}}
@@ -50,25 +59,29 @@
 {{end}}
 
 {{define "JS"}}
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            let checkboxAll = document.querySelectorAll('input');
-            for(let item of checkboxAll){
-                item.addEventListener('click', async (event) => {
-                    let taskId = event.target.dataset.taskId;
-                    let taskCmpleted = event.target.checked;
+<script>
+    function createTask() {
 
-                    let data = await fetch(`/${taskId}/${taskCmpleted}`, {
-                        method: 'POST',
-                    });
+    }
 
-                    let dataTask = await data.json();
-                    if(dataTask){
-                       // console.log(dataTask);
-                        window.location.reload();
-                    }
+    document.addEventListener('DOMContentLoaded', () => {
+        let checkboxAll = document.querySelectorAll('input');
+        for (let item of checkboxAll) {
+            item.addEventListener('click', async (event) => {
+                let taskId = event.target.dataset.taskId;
+                let taskCmpleted = event.target.checked;
+
+                let data = await fetch(`/${taskId}/${taskCmpleted}`, {
+                    method: 'POST',
                 });
-            }
-        });
-    </script>
+
+                let dataTask = await data.json();
+                if (dataTask) {
+                    // console.log(dataTask);
+                    window.location.reload();
+                }
+            });
+        }
+    });
+</script>
 {{end}}
