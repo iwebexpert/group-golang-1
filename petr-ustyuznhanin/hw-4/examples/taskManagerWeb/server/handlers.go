@@ -21,13 +21,14 @@ func (serv *Server) getTemplateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	file, err := os.Open(path.Join(serv.rootDir, serv.templatesDir, templateName))
-	if err != os.ErrNotExist {
-		w.WriteHeader(http.StatusNotFound)
+	if err != nil {
+		if err != os.ErrNotExist {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+		serv.SendInternalErr(w, err)
 		return
 	}
-
-	serv.SendInternalErr(w, err)
-	return
 
 	data, err := ioutil.ReadAll(file)
 	if err != nil {

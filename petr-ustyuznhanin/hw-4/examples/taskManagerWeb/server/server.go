@@ -10,6 +10,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// plus minus standart template for server
+
+//Server ...
 type Server struct {
 	lg            *logrus.Logger
 	db            *sql.DB
@@ -19,6 +22,7 @@ type Server struct {
 	Page          models.Page
 }
 
+//New create new server
 func New(lg *logrus.Logger, rootDir string, db *sql.DB) *Server {
 	return &Server{
 		lg:            lg,
@@ -34,6 +38,7 @@ func New(lg *logrus.Logger, rootDir string, db *sql.DB) *Server {
 	}
 }
 
+//Start ...
 func (serv *Server) Start(addr string) error {
 	r := chi.NewRouter()
 	serv.bindRoutes(r)
@@ -41,6 +46,7 @@ func (serv *Server) Start(addr string) error {
 	return http.ListenAndServe(addr, r)
 }
 
+//SendErr обрабатывает общие маршруты для сервера, есили что-то не обрабатывается, то возвращается ошибка
 func (serv *Server) SendErr(w http.ResponseWriter, err error, code int, obj ...interface{}) {
 	serv.lg.WithField("data", obj).WithError(err).Error("server error")
 	w.WriteHeader(code)
@@ -54,6 +60,7 @@ func (serv *Server) SendErr(w http.ResponseWriter, err error, code int, obj ...i
 	w.Write(data)
 }
 
+//SendInternalErr ...
 func (serv *Server) SendInternalErr(w http.ResponseWriter, err error, obj ...interface{}) {
 	serv.SendErr(w, err, http.StatusInternalServerError, obj)
 }

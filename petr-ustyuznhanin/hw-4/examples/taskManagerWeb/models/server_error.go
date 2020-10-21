@@ -1,5 +1,6 @@
 package models
 
+//ErrorModel ..
 type ErrorModel struct {
 	Code     int         `json:"code"`
 	Err      string      `json:"err"`
