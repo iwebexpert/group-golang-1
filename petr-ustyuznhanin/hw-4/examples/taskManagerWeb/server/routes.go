@@ -9,6 +9,8 @@ func (server *Server) bindRoutes(r *chi.Mux) {
 		r.Get("/{template}", server.getTemplateHandler)
 		r.Route("/api/v1", func(r chi.Router) {
 			r.Post("/tasks", server.postTaskHandler)
+			r.Delete("/tasks/{id}", server.deleteTaskHandler)
+			r.Put("/tasks/{id}", server.putTaskHandler)
 		})
 	})
 }

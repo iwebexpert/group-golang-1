@@ -73,3 +73,37 @@ func (serv *Server) postTaskHandler(w http.ResponseWriter, r *http.Request) {
 	data, _ = json.Marshal(task)
 	w.Write(data)
 }
+
+//редактирование задачи
+func (serv *Server) putTaskHandler(w http.ResponseWriter, r *http.Request) {
+	taskID := chi.URLParam(r, "id")
+
+	data, _ := ioutil.ReadAll(r.Body)
+
+	task := models.TaskItem{}
+	_ = json.Unmarshal(data, &task)
+
+	task.ID = taskID //TODO: по хорошему нужна проверка
+
+	if err := task.Update(serv.db); err != nil {
+		serv.SendInternalErr(w, err)
+		return
+	}
+
+	data, _ = json.Marshal(task)
+	w.Write(data)
+}
+
+//удаление задачи
+func (serv *Server) deleteTaskHandler(w http.ResponseWriter, r *http.Request) {
+	taskID := chi.URLParam(r, "id")
+
+	task := models.TaskItem{ID: taskID}
+
+	if err := task.Delete(serv.db); err != nil {
+		serv.SendInternalErr(w, err)
+		return
+	}
+
+	w.Write(nil)
+}

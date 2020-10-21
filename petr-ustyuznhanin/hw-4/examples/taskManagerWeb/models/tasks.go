@@ -34,3 +34,17 @@ func (task *TaskItem) Insert(db *sql.DB) error {
 
 	return err
 }
+
+func (task *TaskItem) Update(db *sql.DB) error {
+	_, err := db.Exec("UPDATE TaskItems SET Text = ?, Completed = ?) WHERE ID = ?",
+		task.Text, task.Completed, task.ID)
+
+	return err
+}
+
+func (task *TaskItem) Delete(db *sql.DB) error {
+	_, err := db.Exec("DELETE FROM TaskItems WHERE ID = ?",
+		task.ID)
+
+	return err
+}
