@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"html/template"
 	"io/ioutil"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 	"server/models"
 
 	"github.com/go-chi/chi"
+	uuid "github.com/satori/go.uuid"
 )
 
 func (serv *Server) getTemplateHandler(w http.ResponseWriter, r *http.Request) {
@@ -52,4 +54,22 @@ func (serv *Server) getTemplateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+}
+
+//создание задачи
+func (serv *Server) postTaskHandler(w http.ResponseWriter, r *http.Request) {
+	data, _ := ioutil.ReadAll(r.Body)
+
+	task := models.TaskItem{}
+	_ = json.Unmarshal(data, &task)
+
+	task.ID = uuid.NewV4().String()
+
+	if err := task.Insert(serv.db); err != nil {
+		serv.SendInternalErr(w, err)
+		return
+	}
+
+	data, _ = json.Marshal(task)
+	w.Write(data)
 }

@@ -27,3 +27,10 @@ func GetAllTasks(db *sql.DB) (TaskItemSlice, error) {
 	}
 	return tasks, nil
 }
+
+func (task *TaskItem) Insert(db *sql.DB) error {
+	_, err := db.Exec("INSERT INTO TaskItems (ID, Text, Completed) VALUES (?, ?, ?)",
+		task.ID, task.Text, task.Completed)
+
+	return err
+}
