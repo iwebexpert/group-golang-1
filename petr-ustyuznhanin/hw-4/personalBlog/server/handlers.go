@@ -39,7 +39,18 @@ func (serv *Server) getTemplateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// to be continued
+	posts, err := models.GetAllPosts(serv.db)
+	if err != nil {
+		serv.SendInternalError(w, err)
+		return
+	}
+
+	serv.Page.Posts = posts
+
+	if err := templ.Execute(w, serv.Page); err != nil {
+		serv.SendInternalError(w, err)
+		return
+	}
 }
 
 func (serv *Server) postPostHandler(w http.ResponseWriter, r *http.Request) {
