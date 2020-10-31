@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"html/template"
 	"io/ioutil"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 	"server/models"
 
 	"github.com/go-chi/chi"
+	uuid "github.com/satori/go.uuid"
 )
 
 func (serv *Server) getTemplateHandler(w http.ResponseWriter, r *http.Request) {
@@ -57,4 +59,15 @@ func (serv *Server) postPostHandler(w http.ResponseWriter, r *http.Request) {
 	data, _ := ioutil.ReadAll(r.Body)
 
 	post := models.PostItem{}
+	_ = json.Unmarshal(data, &post)
+
+	post.ID = uuid.NewV4().String()
+
+	if err := post.Insert(serv.db); err != nil {
+		serv.SendInternalError(w, err)
+		return
+	}
+
+	data, _ = json.Marshal(post)
+	w.Write(data)
 }

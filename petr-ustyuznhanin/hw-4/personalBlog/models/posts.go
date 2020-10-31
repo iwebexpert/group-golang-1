@@ -30,3 +30,9 @@ func GetAllPosts(db *sql.DB) (PostItemSlice, error) {
 	}
 	return posts, nil
 }
+
+func (post *PostItem) Insert(db *sql.DB) error {
+	_, err := db.Exec("INSERT INTO PostItems (ID, Title, Text) VALUES (?, ?, ?)",
+		post.ID, post.Title, post.Text)
+	return err
+}
