@@ -37,8 +37,13 @@ func (post *PostItem) Insert(db *sql.DB) error {
 	return err
 }
 
-func (post *PostItem) Update(db sql.DB) error {
+func (post *PostItem) Update(db *sql.DB) error {
 	_, err := db.Exec("UPDATE PostItems SET Title = ?, Text = ? WHERE ID = ?",
 		post.Title, post.Text, post.ID)
+	return err
+}
+
+func (post *PostItem) Delete(db *sql.DB) error {
+	_, err := db.Exec("DROP FROM PostItems WHERE ID = ?", post.ID)
 	return err
 }

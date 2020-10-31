@@ -90,3 +90,14 @@ func (serv *Server) putPostHandler(w http.ResponseWriter, r *http.Request) {
 	data, _ = json.Marshal(post)
 	w.Write(data)
 }
+
+func (serv *Server) deletePostHandler(w http.ResponseWriter, r *http.Request) {
+	postID := chi.URLParam(r, "id")
+
+	post := models.PostItem{ID: postID}
+
+	if err := post.Delete(serv.db); err != nil {
+		serv.SendInternalError(w, err)
+		return
+	}
+}
