@@ -36,3 +36,9 @@ func (post *PostItem) Insert(db *sql.DB) error {
 		post.ID, post.Title, post.Text)
 	return err
 }
+
+func (post *PostItem) Update(db sql.DB) error {
+	_, err := db.Exec("UPDATE PostItems SET Title = ?, Text = ? WHERE ID = ?",
+		post.Title, post.Text, post.ID)
+	return err
+}

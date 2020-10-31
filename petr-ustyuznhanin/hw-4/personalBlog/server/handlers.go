@@ -71,3 +71,22 @@ func (serv *Server) postPostHandler(w http.ResponseWriter, r *http.Request) {
 	data, _ = json.Marshal(post)
 	w.Write(data)
 }
+
+func (serv *Server) putPostHandler(w http.ResponseWriter, r *http.Request) {
+	postID := chi.URLParam(r, "id")
+
+	data, _ := ioutil.ReadAll(r.Body)
+	post := models.PostItem{}
+
+	_ = json.Unmarshal(data, &post)
+
+	post.ID = postID //TODO: нужна ли проверка на существование такого ID?
+
+	if err := post.Update(serv.db); err != nil {
+		serv.SendInternalError(w, err)
+		return
+	}
+
+	data, _ = json.Marshal(post)
+	w.Write(data)
+}
