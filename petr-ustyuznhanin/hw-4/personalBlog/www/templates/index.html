@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <!-- TODO: попробовать переделать на Bootstrap -->
+  {{template "UIkit"}} 
+  {{template "JS"}}
+    <title>My personal blog</title>
+</head>
+<body>
+  <h1>PERSONAL BLOG</h1>
+
+  <div class="uk-card uk-card-default uk-card-body">
+    {{template "Posts" .}}
+    <hr>
+    {{template "NewPost" .}}
+</div>
+  
+</body>
+</html>
+
+{{define "Posts"}}
+<div class="uk-card uk-card-body">
+  {{range $key, $val := .Tasks}}
+  <div class="uk-card uk-card-default uk-card-body" task-id="{{.ID}}">
+      <div>
+          {{if .Completed}}
+          <input data-task-id="{{$key}}" class="checkbox uk-checkbox" type="checkbox" onclick="updateTask('{{.ID}}')"
+              checked>
+          {{else}}
+          <input data-task-id="{{$key}}" class="checkbox uk-checkbox" type="checkbox" onclick="updateTask('{{.ID}}')">
+          {{end}}
+          <button class="uk-button uk-button-default" onclick="updateTask('{{.ID}}')">Сохранить</button>
+          <button class="uk-button uk-button-default" onclick="deleteTask('{{.ID}}')">Удалить</button>
+      </div>
+      <input type="text" class="uk-input" value="{{.Text}}" />
+  </div>
+  {{end}}
+</div>
+{{end}}
+
+{{define "UIkit"}}
+<!-- UIkit CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/css/uikit.min.css" />
+
+<!-- UIkit JS -->
+<script src="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/js/uikit.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/js/uikit-icons.min.js"></script>
+{{end}}
+
+{{define "JS"}}
+<!-- TODO: add JS -->
+{{end}}
