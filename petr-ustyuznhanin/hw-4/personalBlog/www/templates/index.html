@@ -29,11 +29,12 @@
   {{range $key, $val := .Posts}}
   <div class="uk-card uk-card-default uk-card-body" post-id="{{.ID}}">
     <div>
+      <input type="title" class="uk-input" value="{{.Title}}" />
+      <input type="text" class="uk-input" value="{{.Text}}" />
       <button class="uk-button uk-button-default" onclick="updatePost('{{.ID}}')">Сохранить</button>
       <button class="uk-button uk-button-default" onclick="deletePost('{{.ID}}')">Удалить</button>
     </div>
-    <input type="text" class="uk-input" value="{{.Text}}" />
-  </div>
+      </div>
   {{end}}
 </div>
 {{end}}
@@ -62,7 +63,7 @@
     let postForm = document.querySelector(`div[post-id="new"]`);
     let postTitle = postForm.querySelector(`input[type="title"]`).value;
     let postText = postForm.querySelector(`input[type="text"]`).value;
-    
+
     let data = await fetch('api/v1/posts', {
       method: "POST",
       body: JSON.stringify({
@@ -70,6 +71,13 @@
         text: postText,
       }),
     });
+
+    let dataPost = data.json();
+    if (dataPost) {
+      console.log(dataPost);
+      window.location.reload();
+    }
+
   }
 </script>
 {{end}}
