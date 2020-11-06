@@ -12,7 +12,7 @@ import (
 func main() {
 	lg := NewLogger()
 
-	db, err := sql.Open("mysql", "personal_blog:1234@/personalblog")
+	db, err := sql.Open("mysql", "personalblog:1234@/personal_blog")
 	if err != nil {
 		lg.WithError(err).Fatal("Не удалось соединиться с БД")
 	}

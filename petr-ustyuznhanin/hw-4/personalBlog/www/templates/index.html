@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <!-- TODO: попробовать переделать на Bootstrap -->
-  {{template "UIkit"}} 
+  <!-- TODO: а надо ли попробовать переделать на Bootstrap? -->
+  {{template "UIkit"}}
   {{template "JS"}}
-    <title>My personal blog</title>
+  <title>My personal blog</title>
 </head>
+
 <body>
   <h1>PERSONAL BLOG</h1>
 
@@ -15,28 +17,33 @@
     {{template "Posts" .}}
     <hr>
     {{template "NewPost" .}}
-</div>
-  
+  </div>
+
 </body>
+
 </html>
 
 {{define "Posts"}}
 <div class="uk-card uk-card-body">
-  {{range $key, $val := .Tasks}}
-  <div class="uk-card uk-card-default uk-card-body" task-id="{{.ID}}">
-      <div>
-          {{if .Completed}}
-          <input data-task-id="{{$key}}" class="checkbox uk-checkbox" type="checkbox" onclick="updateTask('{{.ID}}')"
-              checked>
-          {{else}}
-          <input data-task-id="{{$key}}" class="checkbox uk-checkbox" type="checkbox" onclick="updateTask('{{.ID}}')">
-          {{end}}
-          <button class="uk-button uk-button-default" onclick="updateTask('{{.ID}}')">Сохранить</button>
-          <button class="uk-button uk-button-default" onclick="deleteTask('{{.ID}}')">Удалить</button>
-      </div>
-      <input type="text" class="uk-input" value="{{.Text}}" />
+  <h2>My posts</h2>
+  {{range $key, $val := .Posts}}
+  <div class="uk-card uk-card-default uk-card-body" post-id="{{.ID}}">
+    <div>
+      <button class="uk-button uk-button-default" onclick="updatePost('{{.ID}}')">Сохранить</button>
+      <button class="uk-button uk-button-default" onclick="deletePost('{{.ID}}')">Удалить</button>
+    </div>
+    <input type="text" class="uk-input" value="{{.Text}}" />
   </div>
   {{end}}
+</div>
+{{end}}
+
+{{define "NewPost"}}
+<div class="uk-card uk-card-default uk-card-body" post-id="new">
+  <h2>Create new post</h2>
+  <input type="title" class="uk-input">
+  <input type="text" class="uk-input">
+  <button class="uk-button uk-button-default" onclick="createPost()">Сохранить</button>
 </div>
 {{end}}
 
