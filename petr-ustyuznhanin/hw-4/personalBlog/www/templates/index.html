@@ -57,5 +57,19 @@
 {{end}}
 
 {{define "JS"}}
-<!-- TODO: add JS -->
+<script>
+  async function createPost() {
+    let postForm = document.querySelector(`div[post-id="new"]`);
+    let postTitle = postForm.querySelector(`input[type="title"]`).value;
+    let postText = postForm.querySelector(`input[type="text"]`).value;
+    
+    let data = await fetch('api/v1/posts', {
+      method: "POST",
+      body: JSON.stringify({
+        title: postTitle,
+        text: postText,
+      }),
+    });
+  }
+</script>
 {{end}}
