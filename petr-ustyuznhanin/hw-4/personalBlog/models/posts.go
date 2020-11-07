@@ -44,6 +44,6 @@ func (post *PostItem) Update(db *sql.DB) error {
 }
 
 func (post *PostItem) Delete(db *sql.DB) error {
-	_, err := db.Exec("DROP FROM PostItems WHERE ID = ?", post.ID)
+	_, err := db.Exec("DELETE FROM PostItems WHERE ID = ?", post.ID)
 	return err
 }

@@ -10,7 +10,7 @@ func (serv *Server) bindRoutes(r *chi.Mux) {
 		r.Route("/api/v1", func(r chi.Router) {
 			r.Post("/posts", serv.postPostHandler)
 			r.Delete("/posts/{id}", serv.deletePostHandler)
-			r.Put("/tasks/{id}", serv.putPostHandler)
+			r.Put("/posts/{id}", serv.putPostHandler)
 		})
 	})
 }

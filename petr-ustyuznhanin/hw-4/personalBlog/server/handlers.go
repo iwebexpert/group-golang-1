@@ -100,4 +100,6 @@ func (serv *Server) deletePostHandler(w http.ResponseWriter, r *http.Request) {
 		serv.SendInternalError(w, err)
 		return
 	}
+
+	w.Write(nil)
 }
