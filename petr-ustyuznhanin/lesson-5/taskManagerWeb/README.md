@@ -10,7 +10,7 @@
 
 3. Подключиться к адмайнеру через localhost:8090/ с именем пользователя root и паролем 1234
 4. создать базу данных taskmanager 
-5. Дать все привелегии, создать нового пользователя taskmanager и в сервере указать %, пароль 1234, так же серваком указать localhost и db
-6. создать таблтицу TaskItems, column name ID varchar 150, Text varchar 255 utf8-general ci , Completed tinyint 1 (boolean тип).
+5. Дать все привелегии, создать нового пользователя taskmanager и в сервере указать %, пароль 1234, так же серваком можно указать localhost и db
+6. создать таблтицу TaskItems, column name ID varchar 150, Text varchar 255 utf8-general ci , Completed tinyint 1 (boolean тип). - можно пропустить этот кусок
 7. создать таблтицу tasks Id int autoincrement, taxt varchar 255 utf8-gemeral-ci
  
