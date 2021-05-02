@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 
 <html>
+
 <head>
-  <title>Beego</title>
+    <title>{{.Post.Title}}</title>
 </head>
+
 <body>
-<h1>Постецкий №{{.Post.Id}}</h1>
-<div>
-    {{.Post.Text}}
-</div>
-<hr>
-<a href="/posts">Назад к списку постов</a>
+    <h1>Постецкий №{{.Post.Id}}</h1>
+    <div>
+        {{.Post.Text}}
+    </div>
+    <hr>
+    <a href="/">На главную</a>
 </body>
+
 </html>

@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	beego.Router("/", &controllers.MainController{})
-	beego.Router("/posts", &controllers.PostController{})
+	beego.Router("/", &controllers.PostController{})
+	beego.Router("/newpost", &controllers.PostController{}, "get:NewPost")
 	beego.Router("/post/:id([0-9]+)", &controllers.PostController{}, "get:GetOnePost")
 }

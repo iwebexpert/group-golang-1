@@ -16,12 +16,15 @@ func (p *Posts) TableName() string {
 	return "posts"
 }
 
-func NewPost(text string) (*Posts, error) {
+func NewPost(title, text string) (*Posts, error) {
+	if title == "" {
+		return nil, fmt.Errorf("Empty post title")
+	}
 	if text == "" {
 		return nil, fmt.Errorf("Empty post text")
 	}
 
-	return &Posts{Text: text}, nil
+	return &Posts{Title: title, Text: text}, nil
 }
 
 func init() {

@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"encoding/json"
-	"fmt"
 	"log"
 	"personalBlog/models"
 	"strconv"
@@ -15,6 +13,7 @@ type PostController struct {
 	beego.Controller
 }
 
+// Get - получить все посты
 func (c *PostController) Get() {
 	beeOrm := orm.NewOrm()
 
@@ -52,18 +51,24 @@ func (c *PostController) GetOnePost() {
 	c.TplName = "post.tpl"
 }
 
+// NewPost - перейти на страницу создания нового поста
+func (p *PostController) NewPost() {
+	p.Data["Title"] = "My blog"
+	p.TplName = "newpost.tpl"
+}
+
 func (c *PostController) Post() {
 	req := struct {
-		Text string `json:"text"`
+		Title string `json:"title"`
+		Text  string `json:"text"`
 	}{}
-	fmt.Println(c.Ctx.Input.RequestBody)
-	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &req); err != nil {
+	if err := c.ParseForm(&req); err != nil {
 		c.Ctx.Output.SetStatus(400)
 		c.Ctx.Output.Body([]byte("Body is empty"))
 		return
 	}
 
-	post, err := models.NewPost(req.Text)
+	post, err := models.NewPost(req.Title, req.Text)
 	if err != nil {
 		c.Ctx.Output.SetStatus(400)
 		c.Ctx.Output.Body([]byte(err.Error()))
@@ -78,7 +83,7 @@ func (c *PostController) Post() {
 		return
 	}
 	_ = id
-
-	c.Data["json"] = post
-	c.ServeJSON()
+	c.Redirect("/", 301)
+	//c.Data["json"] = post
+	//c.ServeJSON()
 }
