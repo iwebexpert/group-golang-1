@@ -11,5 +11,5 @@
 3. Подключиться к адмайнеру через localhost:8090/ с именем пользователя root и паролем 1234
 4. создать базу данных personalblog 
 5. Дать все привелегии, создать нового пользователя taskmanager и в сервере указать %, пароль 1234, так же серваком можно указать localhost и db
-6. создать таблтицу posts Id int autoincrement, taxt varchar 255 utf8-gemeral-ci
+6. создать таблтицу posts Id int autoincrement, taxt varchar 255 utf8-gemeral-ci, title varchar 150 utf8-general-ci.
  
