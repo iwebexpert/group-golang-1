@@ -3,6 +3,7 @@
 <html>
 
 <head>
+    {{template "script.tpl"}}
     <title>{{.Post.Title}}</title>
 </head>
 
@@ -11,8 +12,12 @@
     <div>
         {{.Post.Text}}
     </div>
+    <div>
+        <input type="button" value="Save"  onclick="updatePost('{{.Post.Id}}')">
+        <input type="reset" value="Reset" >
+    </div>
     <hr>
-    <a href="/">На главную</a>
+    <a href="/">Main page</a>
 </body>
 
 </html>

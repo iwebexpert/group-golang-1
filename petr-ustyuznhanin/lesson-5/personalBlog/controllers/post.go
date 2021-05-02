@@ -52,7 +52,7 @@ func (c *PostController) GetOnePost() {
 }
 
 // NewPost - перейти на страницу создания нового поста
-func (p *PostController) NewPost() {
+func (p *PostController) NewPostPage() {
 	p.Data["Title"] = "My blog"
 	p.TplName = "newpost.tpl"
 }
@@ -76,13 +76,46 @@ func (c *PostController) Post() {
 	}
 
 	beeOrm := orm.NewOrm()
-	id, err := beeOrm.Insert(post)
+	_, err = beeOrm.Insert(post)
 	if err != nil {
 		c.Ctx.Output.SetStatus(400)
 		c.Ctx.Output.Body([]byte("SQL insert error"))
 		return
 	}
-	_ = id
+
+	c.Redirect("/", 301)
+	//c.Data["json"] = post
+	//c.ServeJSON()
+}
+
+// Put - редактирование задачи
+func (c *PostController) Put() {
+	req := struct {
+		Id    uint64 `json:"id"`
+		Title string `json:"title"`
+		Text  string `json:"text"`
+	}{}
+	if err := c.ParseForm(&req); err != nil { //TODO: добавить проверку на ID
+		c.Ctx.Output.SetStatus(400)
+		c.Ctx.Output.Body([]byte("Body is empty"))
+		return
+	}
+
+	post, err := models.UpdatePost(req.Title, req.Text, req.Id)
+	if err != nil {
+		c.Ctx.Output.SetStatus(400)
+		c.Ctx.Output.Body([]byte(err.Error()))
+		return
+	}
+
+	beeOrm := orm.NewOrm()
+	_, err = beeOrm.Update(post)
+	if err != nil {
+		c.Ctx.Output.SetStatus(400)
+		c.Ctx.Output.Body([]byte("SQL update error"))
+		return
+	}
+
 	c.Redirect("/", 301)
 	//c.Data["json"] = post
 	//c.ServeJSON()

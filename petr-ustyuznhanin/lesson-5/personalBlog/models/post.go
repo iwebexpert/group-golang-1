@@ -27,6 +27,17 @@ func NewPost(title, text string) (*Posts, error) {
 	return &Posts{Title: title, Text: text}, nil
 }
 
+func UpdatePost(title, text string, id uint64) (*Posts, error) {
+	if title == "" {
+		return nil, fmt.Errorf("Empty post title")
+	}
+	if text == "" {
+		return nil, fmt.Errorf("Empty post text")
+	}
+
+	return &Posts{Title: title, Text: text}, nil
+}
+
 func init() {
 	orm.RegisterModel(new(Posts))
 }
