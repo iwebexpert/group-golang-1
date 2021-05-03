@@ -5,7 +5,7 @@
         let postTitle = postForm.querySelector('input[name="Title"]').value;
         let postText = postForm.querySelector('input[name="Text"]').value;
         let data = await fetch(`/post/${id}`, {
-                    method: 'POST',
+                    method: 'PUT',
                     body: JSON.stringify({
                         title: postTitle,
                         text: postText,
