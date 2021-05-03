@@ -2,8 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
 	"personalBlog/models"
 	"strconv"
 
@@ -23,7 +21,9 @@ func (c *PostController) Get() {
 
 	_, err := beeOrm.QueryTable("posts").All(&posts)
 	if err != nil {
-		log.Fatal(err)
+		c.Ctx.Output.SetStatus(400)
+		c.Ctx.Output.Body([]byte(err.Error()))
+		return
 	}
 
 	c.Data["Title"] = "My personal blog"
@@ -85,7 +85,7 @@ func (c *PostController) Post() {
 		return
 	}
 
-	c.Redirect("/", 301)
+	c.Redirect("/", 301) // по сути отдать на фронт нужно джсон как две строки снизу
 	//c.Data["json"] = post
 	//c.ServeJSON()
 }
@@ -93,8 +93,8 @@ func (c *PostController) Post() {
 // Put - редактирование поста
 func (c *PostController) Put() {
 	req := struct {
-		Header string `json: "header"`
-		Text   string `json: "text"`
+		Title string `json: "title"`
+		Text  string `json: "text"`
 	}{}
 	id := c.Ctx.Input.Param(":id")
 	uid64, err := strconv.ParseUint(id, 10, 64)
@@ -109,7 +109,7 @@ func (c *PostController) Put() {
 		return
 	}
 
-	post, err := models.UpdatePost(req.Header, req.Text, uid64)
+	post, err := models.UpdatePost(req.Title, req.Text, uid64)
 	if err != nil {
 		c.Ctx.Output.SetStatus(400)
 		c.Ctx.Output.Body([]byte(err.Error()))
@@ -117,16 +117,16 @@ func (c *PostController) Put() {
 	}
 	beeOrm := orm.NewOrm()
 
-	pid, err := beeOrm.Update(post)
+	_, err = beeOrm.Update(post)
 	if err != nil {
-		fmt.Println(err)
 		c.Ctx.Output.SetStatus(400)
 		c.Ctx.Output.Body([]byte("Error updating post in BD"))
 		return
 	}
-	_ = pid
-	c.Data["json"] = post
-	c.ServeJSON()
+
+	c.Redirect("/", 301)
+	//c.Data["json"] = post
+	//c.ServeJSON()
 }
 
 func (c *PostController) Delete() {

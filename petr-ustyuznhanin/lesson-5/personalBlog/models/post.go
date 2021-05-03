@@ -35,7 +35,7 @@ func UpdatePost(title, text string, id uint64) (*Posts, error) {
 		return nil, fmt.Errorf("Empty post text")
 	}
 
-	return &Posts{Title: title, Text: text}, nil
+	return &Posts{Id: id, Title: title, Text: text}, nil
 }
 
 func init() {
