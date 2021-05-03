@@ -17,4 +17,13 @@
             window.location.reload();
         }
     }
+
+    async function deletePost(id){
+        console.log('deletePost()');
+        fetch(`/post/${id}`, {
+            method: 'DELETE',
+            }).then(response => {
+                window.location.replace('/');
+            });
+    }
 </script>
