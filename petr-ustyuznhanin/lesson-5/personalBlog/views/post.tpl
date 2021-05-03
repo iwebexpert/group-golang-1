@@ -13,8 +13,8 @@
     </div>
     <div>
         <form post-id="{{.Post.Id}}">
-            <input type="text" name="Title" placeholder="Post Title" />
-            <input type="text" name="Text" placeholder="Post text" />
+            <input type="text" name="Title" placeholder="Post Title"/>
+            <input type="text" name="Text" placeholder="Post text"/>
             <input type="reset" value="Reset">
             <input type="button" value="Save" onclick="updatePost('{{.Post.Id}}')">
             <input type="button" value="Delete" onclick="deletePost('{{.Post.Id}}')">

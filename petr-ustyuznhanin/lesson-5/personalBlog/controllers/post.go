@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"encoding/json"
 	"personalBlog/models"
 	"strconv"
 
@@ -103,7 +102,7 @@ func (c *PostController) Put() {
 		c.Ctx.Output.Body([]byte("Post id is incorrect1"))
 		return
 	}
-	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &req); err != nil {
+	if err := c.ParseForm(&req); err != nil {
 		c.Ctx.Output.SetStatus(400)
 		c.Ctx.Output.Body([]byte("Body is empty"))
 		return
