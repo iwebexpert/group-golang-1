@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- TODO: а надо ли попробовать переделать на Bootstrap? -->
+  {{template "UIkit"}}
+  {{template "JS"}}
+  <title>My personal blog</title>
+</head>
+
+<body>
+  <h1>PERSONAL BLOG</h1>
+
+  <div class="uk-card uk-card-default uk-card-body">
+    {{template "Posts" .}}
+    <hr>
+    {{template "NewPost" .}}
+  </div>
+
+</body>
+
+</html>
+
+{{define "Posts"}}
+<div class="uk-card uk-card-body">
+  <h2>My posts</h2>
+  {{range $key, $val := .Posts}}
+  <div class="uk-card uk-card-default uk-card-body" post-id="{{.ID}}">
+    <div>
+      <input type="title" class="uk-input" value="{{.Title}}" />
+      <input type="text" class="uk-input" value="{{.Text}}" />
+      <button class="uk-button uk-button-default" onclick="updatePost('{{.ID}}')">Сохранить</button>
+      <button class="uk-button uk-button-default" onclick="deletePost('{{.ID}}')">Удалить</button>
+    </div>
+  </div>
+  {{end}}
+</div>
+{{end}}
+
+{{define "NewPost"}}
+<div class="uk-card uk-card-default uk-card-body" post-id="new">
+  <h2>Create new post</h2>
+  <input type="title" class="uk-input">
+  <input type="text" class="uk-input">
+  <button class="uk-button uk-button-default" onclick="createPost()">Сохранить</button>
+</div>
+{{end}}
+
+{{define "UIkit"}}
+<!-- UIkit CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/css/uikit.min.css" />
+
+<!-- UIkit JS -->
+<script src="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/js/uikit.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/uikit@3.5.6/dist/js/uikit-icons.min.js"></script>
+{{end}}
+
+{{define "JS"}}
+<script>
+  async function createPost() {
+    let postForm = document.querySelector(`div[post-id="new"]`);
+    let postTitle = postForm.querySelector(`input[type="title"]`).value;
+    let postText = postForm.querySelector(`input[type="text"]`).value;
+
+    let data = await fetch(`api/v1/posts`, {
+      method: "POST",
+      body: JSON.stringify({
+        title: postTitle,
+        text: postText,
+      }),
+    });
+
+    let dataPost = data.json();
+    if (dataPost) {
+      console.log(dataPost);
+      window.location.reload();
+    }
+  }
+
+  async function updatePost(id) {
+   let postForm = document.querySelector(`div[post-id="${id}"]`);
+   let postTitle = document.querySelector(`input[type="title"]`).value;
+   let postText = document.querySelector(`input[type="text"]`).value;
+
+   let data = await fetch (`api/v1/posts/${id}`, {
+     method: "PUT",
+     body: JSON.stringify({
+       title: postTitle,
+       text: postText,
+     }),
+   });
+
+   let dataPost = data.json();
+   if (dataPost) {
+     console.log(dataPost);
+     window.location.reload();
+   };
+  }
+
+  function deletePost(id) {
+    fetch(`api/v1/posts/${id}`, {
+      method: "DELETE",
+    }).then(response => {
+     window.location.reload();
+    });
+  }
+
+  
+</script>
+{{end}}
